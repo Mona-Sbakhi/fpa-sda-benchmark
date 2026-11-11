@@ -1,0 +1,18 @@
+{
+  "n_opt": 4186,
+  "n_val": 1046,
+  "n_test": 624,
+  "opt_class_counts": [
+    1079,
+    3107
+  ],
+  "val_class_counts": [
+    270,
+    776
+  ],
+  "test_class_counts": [
+    234,
+    390
+  ],
+  "pca_explained_variance": 0.9807137846946716
+}

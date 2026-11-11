@@ -1,0 +1,36 @@
+\begin{table*}[!t]
+\centering
+\caption{Test-set performance on frozen ResNet-50 features (2048--16--2 head, $D=32{,}818$); mean$\pm$SD over 50 independent runs with paired seeds. Best value per group in bold.}
+\label{tab:cnn_main}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lccccccc}
+\toprule
+Method & Acc. (\%) & Bal. acc. (\%) & Sens. (\%) & Spec. (\%) & MCC & AUC & Time (s) \\
+\midrule
+\multicolumn{8}{l}{\textit{Gradient-free optimisers (6,795 fitness evaluations each)}} \\
+FPA & 64.88$\pm$5.62 & 62.60$\pm$4.26 & 71.71$\pm$12.77 & 53.49$\pm$10.78 & 0.260$\pm$0.087 & 0.686$\pm$0.059 & 44.1 \\
+SDA & 70.67$\pm$3.50 & 67.54$\pm$4.08 & 80.05$\pm$4.78 & 55.03$\pm$8.57 & 0.362$\pm$0.079 & 0.758$\pm$0.045 & 43.0 \\
+Hybrid FPA--SDA (transfer) & 70.31$\pm$3.96 & 66.64$\pm$4.45 & 81.32$\pm$5.39 & 51.97$\pm$8.90 & 0.350$\pm$0.088 & 0.755$\pm$0.052 & 43.4 \\
+Hybrid FPA--SDA (re-init) & 70.57$\pm$3.06 & 67.09$\pm$3.31 & 81.03$\pm$4.32 & 53.15$\pm$6.41 & 0.357$\pm$0.067 & 0.757$\pm$0.039 & 43.4 \\
+Random search & 61.50$\pm$4.14 & 58.75$\pm$4.45 & 69.75$\pm$8.62 & 47.76$\pm$11.81 & 0.178$\pm$0.088 & 0.632$\pm$0.056 & 36.4 \\
+PSO & 77.11$\pm$2.54 & 73.18$\pm$2.86 & 88.89$\pm$2.92 & 57.46$\pm$5.19 & 0.498$\pm$0.058 & 0.849$\pm$0.030 & 39.3 \\
+DE & 72.62$\pm$4.50 & 69.02$\pm$4.70 & 83.39$\pm$6.75 & 54.65$\pm$8.97 & 0.402$\pm$0.095 & 0.791$\pm$0.055 & 38.5 \\
+GA & 79.84$\pm$1.59 & 75.63$\pm$1.85 & 92.49$\pm$1.56 & 58.76$\pm$3.38 & 0.561$\pm$0.037 & 0.890$\pm$0.015 & 41.9 \\
+L-SHADE & \textbf{80.89$\pm$1.51} & \textbf{76.72$\pm$1.86} & \textbf{93.39$\pm$1.00} & 60.06$\pm$3.47 & \textbf{0.585$\pm$0.034} & \textbf{0.899$\pm$0.012} & 59.5 \\
+APH (redesigned hybrid) & 80.71$\pm$1.68 & 76.60$\pm$2.11 & 93.07$\pm$1.54 & \textbf{60.13$\pm$4.28} & 0.581$\pm$0.038 & 0.898$\pm$0.013 & 53.5 \\
+\midrule
+\multicolumn{8}{l}{\textit{Metaheuristic + gradient (memetic) and gradient-only control}} \\
+Adam from random init. & 77.38$\pm$1.82 & 71.83$\pm$2.31 & 94.02$\pm$1.42 & 49.63$\pm$4.61 & 0.507$\pm$0.043 & 0.849$\pm$0.024 & 21.2 \\
+Hybrid + Adam (memetic) & 80.21$\pm$1.13 & 74.82$\pm$1.45 & 96.37$\pm$0.72 & 53.27$\pm$2.89 & 0.578$\pm$0.025 & 0.914$\pm$0.009 & 40.6 \\
+APH + Adam (memetic) & \textbf{81.08$\pm$1.20} & \textbf{75.78$\pm$1.56} & \textbf{97.00$\pm$0.71} & \textbf{54.56$\pm$3.11} & \textbf{0.599$\pm$0.027} & \textbf{0.920$\pm$0.007} & 47.2 \\
+\midrule
+\multicolumn{8}{l}{\textit{Reference classifiers trained by gradient methods}} \\
+Majority class & 62.50$\pm$0.00 & 50.00$\pm$0.00 & \textbf{100.00$\pm$0.00} & 0.00$\pm$0.00 & 0.000$\pm$0.000 & 0.500$\pm$0.000 & 0.0 \\
+Logistic regression & \textbf{82.69$\pm$0.00} & \textbf{77.78$\pm$0.00} & 97.44$\pm$0.00 & \textbf{58.12$\pm$0.00} & \textbf{0.635$\pm$0.000} & 0.934$\pm$0.000 & 0.2 \\
+MLP, backprop (SGD) & 80.94$\pm$1.20 & 75.36$\pm$1.54 & 97.68$\pm$0.46 & 53.04$\pm$2.95 & 0.599$\pm$0.027 & 0.933$\pm$0.007 & 1.3 \\
+MLP, backprop (Adam) & 81.52$\pm$1.15 & 76.06$\pm$1.46 & 97.87$\pm$0.44 & 54.26$\pm$2.75 & 0.612$\pm$0.026 & \textbf{0.937$\pm$0.006} & 1.1 \\
+\bottomrule
+\end{tabular}}
+\end{table*}

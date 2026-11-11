@@ -1,0 +1,114 @@
+{
+  "package_version": "0.2.0",
+  "python": "3.13.18",
+  "numpy": "2.5.4",
+  "scipy": "1.18.1",
+  "sklearn": "1.9.1",
+  "platform": "Linux-6.18.44-fc-v310-x86_64-with-glibc2.39",
+  "processor": "x86_64",
+  "cpu_count": 4,
+  "started": "2026-11-08 18:58:56",
+  "config": {
+    "name": "cnn_head",
+    "description": "Main experiment of the revision: frozen ImageNet ResNet-50 features (2048-d, standardised) and a 2048-16-2 classifier head (32,818 parameters) trained by each optimiser under the same budget (45 x 150).",
+    "data": {
+      "root": "/home/user/data/chest_xray",
+      "size": 150,
+      "cache_dir": "cache"
+    },
+    "features": {
+      "type": "cnn",
+      "path": "cache/resnet50_224.npz",
+      "standardize": true
+    },
+    "split": {
+      "val_fraction": 0.2,
+      "seed": 42
+    },
+    "model": {
+      "hidden": [
+        16
+      ],
+      "l2_lambda": 0.001,
+      "class_weighted": true
+    },
+    "budget": {
+      "pop_size": 45,
+      "iterations": 150
+    },
+    "bounds": [
+      -1.0,
+      1.0
+    ],
+    "runs": 50,
+    "seed0": 0,
+    "output_dir": "results",
+    "algorithms": {
+      "Hybrid": {
+        "type": "hybrid",
+        "transition": 75,
+        "mode": "transfer"
+      },
+      "Hybrid-reinit": {
+        "type": "hybrid",
+        "transition": 75,
+        "mode": "reinit",
+        "reinit_sigma": 0.05
+      },
+      "FPA": {
+        "type": "fpa",
+        "switch_probability": 0.8
+      },
+      "SDA": {
+        "type": "sda",
+        "dispersal_probs": [
+          0.7,
+          0.15,
+          0.15
+        ]
+      },
+      "PSO": {
+        "type": "pso"
+      },
+      "DE": {
+        "type": "de",
+        "F": 0.5,
+        "CR": 0.9
+      },
+      "GA": {
+        "type": "ga"
+      },
+      "Random": {
+        "type": "random"
+      }
+    },
+    "baselines": {
+      "Majority": {
+        "type": "majority"
+      },
+      "LogReg": {
+        "type": "logreg",
+        "C": 1.0
+      },
+      "MLP-Adam": {
+        "type": "mlp_backprop",
+        "solver": "adam",
+        "lr": 0.001,
+        "epochs": 150,
+        "hidden": [
+          16
+        ]
+      },
+      "MLP-SGD": {
+        "type": "mlp_backprop",
+        "solver": "sgd",
+        "lr": 0.001,
+        "momentum": 0.9,
+        "epochs": 150,
+        "hidden": [
+          16
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "package_version": "0.2.0",
+  "python": "3.13.18",
+  "numpy": "2.5.4",
+  "scipy": "1.18.1",
+  "sklearn": "1.9.1",
+  "platform": "Linux-6.18.44-fc-v310-x86_64-with-glibc2.39",
+  "processor": "x86_64",
+  "cpu_count": 4,
+  "started": "2026-11-09 12:07:08",
+  "config": {
+    "name": "cnn_redesign_ablation",
+    "description": "APH component ablations and cross-field gradient-free baselines (20 runs).",
+    "data": {
+      "root": "/home/user/data/chest_xray",
+      "size": 150,
+      "cache_dir": "cache"
+    },
+    "features": {
+      "type": "cnn",
+      "path": "cache/resnet50_224.npz",
+      "standardize": true
+    },
+    "split": {
+      "val_fraction": 0.2,
+      "seed": 42
+    },
+    "model": {
+      "hidden": [
+        16
+      ],
+      "l2_lambda": 0.001,
+      "class_weighted": true
+    },
+    "budget": {
+      "pop_size": 45,
+      "iterations": 150
+    },
+    "bounds": [
+      -1.0,
+      1.0
+    ],
+    "runs": 20,
+    "seed0": 0,
+    "output_dir": "results",
+    "algorithms": {
+      "APH-uniform-ops": {
+        "type": "aph",
+        "aos_rate": 0.0
+      },
+      "APH-no-crossover": {
+        "type": "aph",
+        "crossover": false
+      },
+      "APH-plant-only": {
+        "type": "aph",
+        "operators": [
+          "global",
+          "local",
+          "gravity"
+        ]
+      },
+      "OpenAI-ES": {
+        "type": "openai_es",
+        "sigma": 0.02,
+        "lr": 0.01
+      },
+      "ZO-SGD": {
+        "type": "zo_sgd",
+        "lr": 0.001,
+        "eps": 0.001
+      }
+    },
+    "baselines": {}
+  }
+}

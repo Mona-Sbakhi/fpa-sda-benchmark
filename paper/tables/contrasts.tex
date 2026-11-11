@@ -1,0 +1,21 @@
+\begin{table}[!t]
+\centering
+\caption{Key contrasts on the three endpoints (50 paired runs). ``Wins'': number of runs in which the first method is better (lower fitness, higher MCC). $p$: Wilcoxon signed-rank, Holm-adjusted over the seven contrasts of each endpoint.}
+\label{tab:contrasts}
+\footnotesize
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{llcccccc}
+\toprule
+ & & \multicolumn{2}{c}{Training fitness} & \multicolumn{2}{c}{Validation MCC} & \multicolumn{2}{c}{Test MCC} \\
+Method & vs & wins & $p$ & wins & $p$ & wins & $p$ \\
+\midrule
+Hybrid FPA--SDA (transfer) & SDA & 0/50 & $<$0.001 & 15/50 & 0.028 & 22/50 & 0.927 \\
+Hybrid FPA--SDA (transfer) & Hybrid FPA--SDA (re-init) & 50/50 & $<$0.001 & 25/50 & 0.916 & 26/50 & 0.927 \\
+Hybrid FPA--SDA (transfer) & DE & 32/50 & 0.003 & 12/50 & $<$0.001 & 15/50 & 0.016 \\
+Hybrid FPA--SDA (transfer) & FPA & 50/50 & $<$0.001 & 47/50 & $<$0.001 & 43/50 & $<$0.001 \\
+SDA & FPA & 50/50 & $<$0.001 & 46/50 & $<$0.001 & 36/50 & $<$0.001 \\
+APH (redesigned hybrid) & L-SHADE & 11/50 & $<$0.001 & 16/50 & 0.012 & 19/50 & 0.927 \\
+APH (redesigned hybrid) & GA & 44/50 & $<$0.001 & 37/50 & $<$0.001 & 37/50 & 0.011 \\
+\bottomrule
+\end{tabular}}
+\end{table}

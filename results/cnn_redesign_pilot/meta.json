@@ -1,0 +1,91 @@
+{
+  "package_version": "0.2.0",
+  "python": "3.13.18",
+  "numpy": "2.5.4",
+  "scipy": "1.18.1",
+  "sklearn": "1.9.1",
+  "platform": "Linux-6.18.44-fc-v310-x86_64-with-glibc2.39",
+  "processor": "x86_64",
+  "cpu_count": 4,
+  "started": "2026-11-09 11:14:37",
+  "config": {
+    "name": "cnn_redesign_pilot",
+    "description": "Track 2 pilot: redesigned hybrid (APH), memetic variants and state-of-the-art gradient-free baselines on the CNN-head task; same seeds as cnn_head runs 0-4.",
+    "data": {
+      "root": "/home/user/data/chest_xray",
+      "size": 150,
+      "cache_dir": "cache"
+    },
+    "features": {
+      "type": "cnn",
+      "path": "cache/resnet50_224.npz",
+      "standardize": true
+    },
+    "split": {
+      "val_fraction": 0.2,
+      "seed": 42
+    },
+    "model": {
+      "hidden": [
+        16
+      ],
+      "l2_lambda": 0.001,
+      "class_weighted": true
+    },
+    "budget": {
+      "pop_size": 45,
+      "iterations": 150
+    },
+    "bounds": [
+      -1.0,
+      1.0
+    ],
+    "runs": 5,
+    "seed0": 0,
+    "output_dir": "results",
+    "algorithms": {
+      "APH": {
+        "type": "aph"
+      },
+      "L-SHADE": {
+        "type": "lshade"
+      },
+      "OpenAI-ES": {
+        "type": "openai_es",
+        "sigma": 0.02,
+        "lr": 0.01
+      },
+      "ZO-SGD": {
+        "type": "zo_sgd",
+        "lr": 0.001,
+        "eps": 0.001
+      },
+      "Memetic-APH": {
+        "type": "memetic",
+        "inner": {
+          "type": "aph"
+        },
+        "inner_fraction": 0.5,
+        "adam_steps": 300,
+        "lr": 0.001
+      },
+      "Memetic-Hybrid": {
+        "type": "memetic",
+        "inner": {
+          "type": "hybrid",
+          "transition": 37,
+          "mode": "transfer"
+        },
+        "inner_fraction": 0.5,
+        "adam_steps": 300,
+        "lr": 0.001
+      },
+      "Adam-only": {
+        "type": "memetic",
+        "adam_steps": 300,
+        "lr": 0.001
+      }
+    },
+    "baselines": {}
+  }
+}

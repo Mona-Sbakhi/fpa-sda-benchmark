@@ -1,0 +1,70 @@
+{
+  "name": "cnn_redesign",
+  "description": "Track 2 confirmatory experiment: redesigned hybrid (APH), L-SHADE and memetic variants on the CNN-head task, 50 runs with the same seeds as cnn_head.",
+  "data": {
+    "root": "/home/user/data/chest_xray",
+    "size": 150,
+    "cache_dir": "cache"
+  },
+  "features": {
+    "type": "cnn",
+    "path": "cache/resnet50_224.npz",
+    "standardize": true
+  },
+  "split": {
+    "val_fraction": 0.2,
+    "seed": 42
+  },
+  "model": {
+    "hidden": [
+      16
+    ],
+    "l2_lambda": 0.001,
+    "class_weighted": true
+  },
+  "budget": {
+    "pop_size": 45,
+    "iterations": 150
+  },
+  "bounds": [
+    -1.0,
+    1.0
+  ],
+  "runs": 50,
+  "seed0": 0,
+  "output_dir": "results",
+  "algorithms": {
+    "APH": {
+      "type": "aph"
+    },
+    "L-SHADE": {
+      "type": "lshade"
+    },
+    "Memetic-APH": {
+      "type": "memetic",
+      "inner": {
+        "type": "aph"
+      },
+      "inner_fraction": 0.5,
+      "adam_steps": 300,
+      "lr": 0.001
+    },
+    "Memetic-Hybrid": {
+      "type": "memetic",
+      "inner": {
+        "type": "hybrid",
+        "transition": 37,
+        "mode": "transfer"
+      },
+      "inner_fraction": 0.5,
+      "adam_steps": 300,
+      "lr": 0.001
+    },
+    "Adam-only": {
+      "type": "memetic",
+      "adam_steps": 300,
+      "lr": 0.001
+    }
+  },
+  "baselines": {}
+}

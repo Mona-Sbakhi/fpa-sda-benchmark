@@ -1,0 +1,99 @@
+{
+  "name": "smoke",
+  "description": "Fast end-to-end check of the pipeline (minutes).",
+  "data": {
+    "root": "/home/user/data/chest_xray",
+    "size": 150,
+    "cache_dir": "cache"
+  },
+  "features": {
+    "type": "pca",
+    "n_components": 100,
+    "standardize": true
+  },
+  "split": {
+    "val_fraction": 0.2,
+    "seed": 42
+  },
+  "model": {
+    "hidden": [
+      128,
+      64,
+      32
+    ],
+    "l2_lambda": 0.001,
+    "class_weighted": true
+  },
+  "budget": {
+    "pop_size": 8,
+    "iterations": 6
+  },
+  "bounds": [
+    -1.0,
+    1.0
+  ],
+  "runs": 2,
+  "seed0": 0,
+  "output_dir": "results",
+  "algorithms": {
+    "Hybrid": {
+      "type": "hybrid",
+      "transition": 3,
+      "mode": "transfer"
+    },
+    "Hybrid-reinit": {
+      "type": "hybrid",
+      "transition": 3,
+      "mode": "reinit",
+      "reinit_sigma": 0.05
+    },
+    "FPA": {
+      "type": "fpa",
+      "switch_probability": 0.8
+    },
+    "SDA": {
+      "type": "sda",
+      "dispersal_probs": [
+        0.7,
+        0.15,
+        0.15
+      ]
+    },
+    "PSO": {
+      "type": "pso"
+    },
+    "DE": {
+      "type": "de",
+      "F": 0.5,
+      "CR": 0.9
+    },
+    "GA": {
+      "type": "ga"
+    },
+    "Random": {
+      "type": "random"
+    }
+  },
+  "baselines": {
+    "Majority": {
+      "type": "majority"
+    },
+    "LogReg": {
+      "type": "logreg",
+      "C": 1.0
+    },
+    "MLP-Adam": {
+      "type": "mlp_backprop",
+      "solver": "adam",
+      "lr": 0.001,
+      "epochs": 150
+    },
+    "MLP-SGD": {
+      "type": "mlp_backprop",
+      "solver": "sgd",
+      "lr": 0.001,
+      "momentum": 0.9,
+      "epochs": 150
+    }
+  }
+}

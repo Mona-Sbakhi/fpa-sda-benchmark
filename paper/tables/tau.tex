@@ -1,0 +1,17 @@
+\begin{table}[!t]
+\centering
+\caption{Sensitivity of the hybrid to the transition iteration $\tau$ (20 paired runs; $\tau=0$ is SDA alone and $\tau=150$ FPA alone, same seeds). Friedman over $\tau\in\{25,\dots,125\}$: $\chi^2_F=29.52$, $p=6.1\times 10^{-6}$. Page's trend test over all seven settings: $L=2591$, $p=3.3\times 10^{-12}$. $p_{\mathrm{Holm}}$: Wilcoxon against $\tau=75$.}
+\label{tab:tau}
+\footnotesize
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lccccccc}
+\toprule
+$\tau$ & 0 & 25 & 50 & 75 & 100 & 125 & 150 \\
+\midrule
+Accuracy (\%) & 71.56 & 71.62 & 70.77 & 70.03 & 66.82 & 64.29 & 63.99 \\
+MCC & 0.381 & 0.380 & 0.356 & 0.345 & 0.286 & 0.235 & 0.243 \\
+AUC & 0.774 & 0.771 & 0.765 & 0.746 & 0.710 & 0.684 & 0.675 \\
+$p_{\mathrm{Holm}}$ (MCC) & 0.568 & 0.131 & 0.568 & -- & 0.568 & 0.002 & $<$0.001 \\
+\bottomrule
+\end{tabular}}
+\end{table}

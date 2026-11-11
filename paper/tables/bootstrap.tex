@@ -1,0 +1,21 @@
+\begin{table}[!t]
+\centering
+\caption{Uncertainty due to the fixed 624-image test set. For each contrast, test images are resampled with replacement (2,000 bootstrap samples) and the difference in run-averaged MCC is recomputed from the stored predictions; seeds are held fixed. Intervals that include 0 indicate contrasts not resolved by this test set, even when they are significant across seeds (Table~\ref{tab:wilcoxon}).}
+\label{tab:bootstrap}
+\footnotesize
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{llrc}
+\toprule
+Method & vs & $\bar\Delta$ MCC & 95\% CI (test images) \\
+\midrule
+APH (redesigned hybrid) & GA & +0.020 & [+0.008, +0.032] \\
+APH (redesigned hybrid) & L-SHADE & -0.004 & [-0.014, +0.006] \\
+L-SHADE & GA & +0.024 & [+0.012, +0.037] \\
+Hybrid FPA--SDA (transfer) & SDA & -0.013 & [-0.029, +0.002] \\
+Hybrid FPA--SDA (transfer) & FPA & +0.090 & [+0.072, +0.106] \\
+Logistic regression & L-SHADE & +0.050 & [+0.004, +0.094] \\
+MLP, backprop (Adam) & APH (redesigned hybrid) & +0.031 & [-0.005, +0.068] \\
+APH + Adam (memetic) & MLP, backprop (Adam) & -0.013 & [-0.031, +0.005] \\
+\bottomrule
+\end{tabular}}
+\end{table}

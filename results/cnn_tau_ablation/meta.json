@@ -1,0 +1,75 @@
+{
+  "package_version": "0.2.0",
+  "python": "3.13.18",
+  "numpy": "2.5.4",
+  "scipy": "1.18.1",
+  "sklearn": "1.9.1",
+  "platform": "Linux-6.18.44-fc-v310-x86_64-with-glibc2.39",
+  "processor": "x86_64",
+  "cpu_count": 4,
+  "started": "2026-11-08 19:37:46",
+  "config": {
+    "name": "cnn_tau_ablation",
+    "description": "Hybrid transition point on the CNN-head task (20 runs per setting).",
+    "data": {
+      "root": "/home/user/data/chest_xray",
+      "size": 150,
+      "cache_dir": "cache"
+    },
+    "features": {
+      "type": "cnn",
+      "path": "cache/resnet50_224.npz",
+      "standardize": true
+    },
+    "split": {
+      "val_fraction": 0.2,
+      "seed": 42
+    },
+    "model": {
+      "hidden": [
+        16
+      ],
+      "l2_lambda": 0.001,
+      "class_weighted": true
+    },
+    "budget": {
+      "pop_size": 45,
+      "iterations": 150
+    },
+    "bounds": [
+      -1.0,
+      1.0
+    ],
+    "runs": 20,
+    "seed0": 0,
+    "output_dir": "results",
+    "algorithms": {
+      "Hybrid-tau25": {
+        "type": "hybrid",
+        "transition": 25,
+        "mode": "transfer"
+      },
+      "Hybrid-tau50": {
+        "type": "hybrid",
+        "transition": 50,
+        "mode": "transfer"
+      },
+      "Hybrid-tau75": {
+        "type": "hybrid",
+        "transition": 75,
+        "mode": "transfer"
+      },
+      "Hybrid-tau100": {
+        "type": "hybrid",
+        "transition": 100,
+        "mode": "transfer"
+      },
+      "Hybrid-tau125": {
+        "type": "hybrid",
+        "transition": 125,
+        "mode": "transfer"
+      }
+    },
+    "baselines": {}
+  }
+}

@@ -1,0 +1,13 @@
+# Revision pipeline (tested with Python 3.13)
+numpy==2.5.4
+scipy==1.18.1
+scikit-learn==1.9.1
+opencv-python-headless==5.0.0.93
+pandas==3.1.1
+matplotlib==3.11.2
+scikit-posthocs==0.17.1
+pytest==9.2.0
+
+# fine-tuning feature extraction
+torch==2.15.0
+torchvision==0.29.2

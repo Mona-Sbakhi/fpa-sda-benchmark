@@ -1,0 +1,6 @@
+Highlights
+- Plant-inspired FPA-SDA hybrid benchmarked under equal budgets and 50 paired runs
+- The hybrid does not outperform SDA and trails GA, PSO, DE and L-SHADE
+- Lengthening the FPA phase degrades the hybrid; SDA alone is as good as any schedule
+- A redesigned hybrid matches L-SHADE, but only through differential-evolution parts
+- Code, configurations and per-run predictions are released for full reproducibility

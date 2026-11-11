@@ -1,0 +1,96 @@
+{
+  "name": "cv_head_fold0",
+  "description": "Head training on fine-tuned features, cross-validation fold 0 (seed-0 CNN), 10 runs per method.",
+  "data": {
+    "root": "/home/user/data/chest_xray",
+    "size": 150,
+    "cache_dir": "cache"
+  },
+  "features": {
+    "type": "cnn",
+    "path": "cache/resnet50_finetuned_seed0.npz",
+    "standardize": true
+  },
+  "split": {
+    "val_fraction": 0.2,
+    "seed": 42
+  },
+  "model": {
+    "hidden": [
+      16
+    ],
+    "l2_lambda": 0.001,
+    "class_weighted": true
+  },
+  "budget": {
+    "pop_size": 45,
+    "iterations": 150
+  },
+  "bounds": [
+    -1.0,
+    1.0
+  ],
+  "runs": 10,
+  "seed0": 3,
+  "output_dir": "results",
+  "algorithms": {
+    "Hybrid@box": {
+      "type": "hybrid",
+      "transition": 75,
+      "mode": "transfer"
+    },
+    "Hybrid@glorot": {
+      "type": "hybrid",
+      "transition": 75,
+      "mode": "transfer",
+      "param_scale": {
+        "type": "glorot",
+        "mult": 2.0
+      }
+    },
+    "L-SHADE@glorot": {
+      "type": "lshade",
+      "param_scale": {
+        "type": "glorot",
+        "mult": 2.0
+      }
+    },
+    "FPA@glorot": {
+      "type": "fpa",
+      "switch_probability": 0.8,
+      "param_scale": {
+        "type": "glorot",
+        "mult": 2.0
+      }
+    },
+    "SDA@glorot": {
+      "type": "sda",
+      "param_scale": {
+        "type": "glorot",
+        "mult": 2.0
+      }
+    },
+    "GA@glorot": {
+      "type": "ga",
+      "param_scale": {
+        "type": "glorot",
+        "mult": 2.0
+      }
+    }
+  },
+  "baselines": {
+    "LogReg": {
+      "type": "logreg",
+      "C": 1.0
+    },
+    "MLP-Adam": {
+      "type": "mlp_backprop",
+      "solver": "adam",
+      "lr": 0.001,
+      "epochs": 150,
+      "hidden": [
+        16
+      ]
+    }
+  }
+}

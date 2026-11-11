@@ -1,0 +1,21 @@
+\begin{table}[!t]
+\centering
+\caption{Component ablation of APH and cross-field gradient-free baselines (20 paired runs). $\bar\Delta$: mean MCC of the variant minus APH; CI: 95\% test-image bootstrap interval of $\bar\Delta$; $p_{\mathrm{Holm}}$: Wilcoxon signed-rank test against APH across runs.}
+\label{tab:ablation}
+\footnotesize
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lccrcc}
+\toprule
+Variant & MCC & AUC & $\bar\Delta$ & CI & $p_{\mathrm{Holm}}$ \\
+\midrule
+APH (full) & 0.581 & 0.899 & -- & -- & -- \\
+-- adaptive operator selection (uniform) & 0.552 & 0.883 & -0.029 & [-0.045, -0.012] & 0.165 \\
+-- binomial crossover (full-vector moves) & 0.550 & 0.875 & -0.031 & [-0.048, -0.013] & 0.028 \\
+-- current-to-$p$best operator (plant operators only) & 0.382 & 0.774 & -0.199 & [-0.226, -0.172] & $<$0.001 \\
+\midrule
+L-SHADE & 0.587 & 0.900 & +0.006 & [-0.009, +0.021] & 0.622 \\
+OpenAI-ES & 0.402 & 0.779 & -0.180 & [-0.203, -0.155] & $<$0.001 \\
+ZO-SGD (SPSA) & 0.386 & 0.770 & -0.195 & [-0.219, -0.170] & $<$0.001 \\
+\bottomrule
+\end{tabular}}
+\end{table}

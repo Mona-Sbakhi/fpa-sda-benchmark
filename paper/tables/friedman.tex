@@ -1,0 +1,23 @@
+\begin{table}[!t]
+\centering
+\caption{Friedman test over the ten gradient-free optimisers (MCC, $N=50$ paired runs): $\chi^2_F=364.78$, $p=4.4\times 10^{-73}$. Mean ranks (1 = best) and Nemenyi critical difference $\mathrm{CD}_{0.05}=1.916$. Nemenyi $p$-values are given against the original hybrid and against APH.}
+\label{tab:friedman}
+\footnotesize
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lccc}
+\toprule
+Optimiser & Mean rank & $p$ vs Hybrid & $p$ vs APH \\
+\midrule
+L-SHADE & 1.80 & $<$0.001 & 1.000 \\
+APH (redesigned hybrid) & 2.06 & $<$0.001 & -- \\
+GA & 2.66 & $<$0.001 & 0.993 \\
+PSO & 3.96 & $<$0.001 & 0.054 \\
+DE & 5.89 & 0.831 & $<$0.001 \\
+Hybrid FPA--SDA (re-init) & 6.78 & 1.000 & $<$0.001 \\
+Hybrid FPA--SDA (transfer) & 6.88 & -- & $<$0.001 \\
+SDA & 6.93 & 1.000 & $<$0.001 \\
+FPA & 8.58 & 0.134 & $<$0.001 \\
+Random search & 9.46 & $<$0.001 & $<$0.001 \\
+\bottomrule
+\end{tabular}}
+\end{table}

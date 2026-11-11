@@ -1,0 +1,30 @@
+\begin{table}[!t]
+\centering
+\caption{Original pipeline: PCA(1000) pixel features and a 1000--128--64--32--2 network ($D=138{,}530$); mean over 10 runs. Raw PCA scores reproduce the original notebook; standardised scores are the variant in which every component has unit variance.}
+\label{tab:pca}
+\footnotesize
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{llccc}
+\toprule
+Features & Method & Acc. (\%) & MCC & AUC \\
+\midrule
+Raw PCA & SDA & 68.5 & 0.347 & 0.733 \\
+ & Hybrid FPA--SDA (transfer) & 60.4 & 0.189 & 0.623 \\
+ & Random search & 58.3 & 0.130 & 0.581 \\
+ & FPA & 56.5 & 0.136 & 0.595 \\
+\midrule
+Standardised PCA & Hybrid FPA--SDA (transfer) & 47.9 & -0.013 & 0.496 \\
+ & Hybrid FPA--SDA (re-init) & 49.1 & 0.014 & 0.521 \\
+ & FPA & 48.7 & -0.010 & 0.507 \\
+ & SDA & 48.8 & -0.000 & 0.503 \\
+ & PSO & 48.9 & 0.012 & 0.509 \\
+ & DE & 50.2 & 0.020 & 0.515 \\
+ & GA & 50.5 & 0.011 & 0.508 \\
+ & Random search & 50.0 & 0.004 & 0.516 \\
+ & Logistic regression & 74.4 & 0.453 & 0.852 \\
+ & MLP, backprop (SGD) & 70.7 & 0.359 & 0.773 \\
+ & MLP, backprop (Adam) & 71.3 & 0.379 & 0.760 \\
+ & Majority class & 62.5 & 0.000 & 0.500 \\
+\bottomrule
+\end{tabular}}
+\end{table}

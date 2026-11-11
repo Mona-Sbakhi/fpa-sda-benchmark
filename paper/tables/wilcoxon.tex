@@ -1,0 +1,32 @@
+\begin{table}[!t]
+\centering
+\caption{Pairwise Wilcoxon signed-rank tests on MCC (50 paired runs), Holm-adjusted within each block. $\bar\Delta$: difference of means; $\tilde\Delta$: median of the 50 paired differences (first method minus second). $\hat A$: Vargha--Delaney effect size ($>0.5$ favours the first method; $|\hat A-0.5|\ge 0.21$ is large).}
+\label{tab:wilcoxon}
+\footnotesize
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{llrrcc}
+\toprule
+Method & vs & $\bar\Delta$ & $\tilde\Delta$ & $p_{\mathrm{Holm}}$ & $\hat A$ \\
+\midrule
+Hybrid FPA--SDA (transfer) & FPA & +0.090 & +0.070 & $<$0.001 & 0.75 \\
+ & SDA & -0.013 & -0.045 & 0.618 & 0.45 \\
+ & Hybrid FPA--SDA (re-init) & -0.007 & +0.004 & 0.833 & 0.47 \\
+ & Random search & +0.172 & +0.166 & $<$0.001 & 0.91 \\
+ & PSO & -0.148 & -0.151 & $<$0.001 & 0.08 \\
+ & DE & -0.052 & -0.061 & 0.012 & 0.34 \\
+ & GA & -0.211 & -0.209 & $<$0.001 & 0.02 \\
+ & L-SHADE & -0.236 & -0.229 & $<$0.001 & 0.01 \\
+ & APH (redesigned hybrid) & -0.232 & -0.229 & $<$0.001 & 0.01 \\
+\midrule
+SDA & FPA & +0.103 & +0.103 & $<$0.001 & 0.81 \\
+\midrule
+APH (redesigned hybrid) & L-SHADE & -0.004 & -0.012 & 0.415 & 0.47 \\
+ & GA & +0.020 & +0.025 & 0.004 & 0.65 \\
+ & PSO & +0.083 & +0.091 & $<$0.001 & 0.88 \\
+ & DE & +0.179 & +0.169 & $<$0.001 & 0.96 \\
+\midrule
+Hybrid + Adam (memetic) & Adam from random init. & +0.070 & +0.074 & $<$0.001 & 0.92 \\
+ & MLP, backprop (Adam) & -0.034 & -0.035 & $<$0.001 & 0.15 \\
+\bottomrule
+\end{tabular}}
+\end{table}

@@ -1,0 +1,15 @@
+\begin{table}[!t]
+\centering
+\caption{End-to-end fine-tuning of ResNet-50 by backpropagation (mean$\pm$SD over seeds). Official split: trained on the optimisation subset, epoch chosen on the validation subset, evaluated once on the official test folder (5 seeds). Cross-validation: patient-grouped 5-fold over all 5,856 images, pooled out-of-fold predictions (3 seeds).}
+\label{tab:finetune}
+\footnotesize
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lccccc}
+\toprule
+Protocol & Acc. (\%) & Sens. (\%) & Spec. (\%) & MCC & AUC \\
+\midrule
+Official test folder (624 images) & 89.04$\pm$1.25 & 99.23$\pm$0.31 & 72.05$\pm$3.75 & 0.773$\pm$0.024 & 0.974$\pm$0.005 \\
+5-fold cross-validation (5,856 images) & 97.43$\pm$0.25 & 97.82$\pm$0.15 & 96.38$\pm$0.69 & 0.935$\pm$0.006 & 0.996$\pm$0.001 \\
+\bottomrule
+\end{tabular}}
+\end{table}
