@@ -9,6 +9,8 @@ The study benchmarks the Flower Pollination Algorithm (FPA), a seed-dispersal al
 sequential hybrid against GA, PSO, DE, L-SHADE, evolution strategies, zeroth-order SGD and gradient-trained
 classifiers on the paediatric chest X-ray pneumonia dataset (Kermany et al., 2018).
 
+Archived release: https://doi.org/10.5281/zenodo.24129035
+
 ## Layout
 ```
 src/fpasda/            data loading, features, flat MLP + fitness, optimisers, baselines, statistics
