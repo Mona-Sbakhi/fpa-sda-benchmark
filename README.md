@@ -2,7 +2,7 @@
 
 Code, configurations, per-run outputs and manuscript sources for
 
-> M. Alsbakhi, M. Lubbad, M. Alhanjouri. *Do plant-inspired operators help to train a pneumonia classifier?
+> M. Alsbakhi, A. Alsaqqa, M. Lubbad. *Do plant-inspired operators help to train a pneumonia classifier?
 > A controlled benchmark and component analysis of a hybrid Flower Pollination–Seed Dispersal algorithm.*
 
 The study benchmarks the Flower Pollination Algorithm (FPA), a seed-dispersal algorithm (SDA) and their

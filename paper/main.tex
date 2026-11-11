@@ -24,13 +24,14 @@
 
 \title{Do plant-inspired operators help to train a pneumonia classifier? A controlled benchmark and component analysis of a hybrid Flower Pollination--Seed Dispersal algorithm}
 
-\author[iug]{Mona Alsbakhi}
-\author[iug]{Mohammed Lubbad}
-\author[iug]{Mohammed Alhanjouri\corref{cor1}}
-\ead{mhanjouri@iugaza.edu.ps}
+\author[eng]{Mona Alsbakhi\corref{cor1}}
+\ead{mona@lubbad.me}
+\author[it,up]{Ahmed Alsaqqa}
+\author[eng]{Mohammed Lubbad}
 \cortext[cor1]{Corresponding author}
-\affiliation[iug]{organization={Computer Engineering Department, Islamic University of Gaza},
-            city={Gaza}, country={Palestine}}
+\affiliation[eng]{organization={Faculty of Engineering, Islamic University of Gaza}, city={Gaza}, country={Palestine}}
+\affiliation[it]{organization={Faculty of Information Technology, Islamic University of Gaza}, city={Gaza}, country={Palestine}}
+\affiliation[up]{organization={University of Palestine}, city={Al-Zahra City, Gaza}, country={Palestine}}
 
 \begin{abstract}
 Hybrids of nature-inspired metaheuristics are frequently proposed for training neural networks in medical imaging, usually on the strength of a single favourable comparison. We examine one such design, a sequential hybrid of the Flower Pollination Algorithm (FPA) and a seed-dispersal algorithm (SDA), on the paediatric chest X-ray pneumonia dataset under a controlled protocol: a patient-grouped validation split, the official test folder (624 images), a common budget of 6,795 fitness evaluations for the gradient-free optimisers, 50 paired runs in the main benchmark and non-parametric statistics on three endpoints (training fitness, validation MCC and test MCC). On frozen ResNet-50 features with a 2048--16--2 classifier head the hybrid reaches a test MCC of \MCCHybrid{} (accuracy \ACCHybrid\%). It is better than FPA (\MCCFpa) and random search on every endpoint; it reaches a worse training fitness than SDA alone in all 50 runs, with a similar test MCC (\MCCSda); and it is below GA (\MCCGa), PSO (\MCCPso) and L-SHADE (\MCCLShade). Lengthening the FPA phase gives a decreasing trend (Page's test $p=\PageP$). A redesigned hybrid that adds the FPA and SDA operators to a success-history differential-evolution framework (APH, designed after these results were known) reaches \MCCAph{}, but L-SHADE without those operators attains a lower training fitness in most runs, and APH restricted to the plant-inspired operators falls back to 0.382. On the original 138,530-dimensional PCA pipeline with standardised inputs, none of the seven gradient-free optimisers tested exceeds chance level. Gradient-trained classifiers are best on frozen features (logistic regression \MCCLogreg). Fine-tuning the network by backpropagation raises accuracy to \FTOffAcc\% on the official test folder and \FTCvAcc\% under patient-grouped five-fold cross-validation, and on the fine-tuned features every optimiser, including the original hybrid (\CvHeadHybrid\%), lies between \CvHeadMin\% and \CvHeadMax\%. On this task the representation, not the choice of optimiser, determines accuracy, and the plant-inspired operators bring no benefit over established components. Code, configurations and per-run outputs are released.
@@ -337,7 +338,7 @@ On this task and under a controlled protocol, the sequential FPA--SDA hybrid was
 The dataset is publicly available \citep{kaggle2018cxr,kermany2018}. Code, configurations, per-run outputs (including test-set probabilities) and the script that generates every table and figure are available at \citet{alsbakhi2026code}; an archived release is deposited at Zenodo (\href{https://doi.org/10.5281/zenodo.24129035}{doi:10.5281/zenodo.24129035}). The data used are the Kaggle redistribution of the dataset released by \citet{kermany2018}.
 
 \section*{CRediT authorship contribution statement}
-\textbf{Mona Alsbakhi:} Conceptualization, Methodology, Software, Investigation, Writing -- original draft. \textbf{Mohammed Lubbad:} Methodology, Validation, Writing -- review \& editing. \textbf{Mohammed Alhanjouri:} Supervision, Writing -- review \& editing.
+\textbf{Mona Alsbakhi:} Conceptualization, Methodology, Software, Investigation, Writing -- original draft. \textbf{Ahmed Alsaqqa:} \emph{[contribution to be stated by the authors]}. \textbf{Mohammed Lubbad:} Methodology, Validation, Writing -- review \& editing.
 
 \section*{Declaration of competing interest}
 The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.

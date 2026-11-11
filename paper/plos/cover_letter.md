@@ -29,4 +29,6 @@ funding. The use of a generative AI tool is disclosed in the Acknowledgments.
 Artificial Intelligence / Evolutionary computation.]
 
 Sincerely,
-[Corresponding author name, affiliation, email]
+Mona Alsbakhi
+Faculty of Engineering, Islamic University of Gaza, Gaza, Palestine
+mona@lubbad.me
