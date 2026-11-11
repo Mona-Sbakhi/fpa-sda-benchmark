@@ -1,0 +1,374 @@
+\documentclass[10pt,letterpaper]{article}
+\usepackage[top=0.85in,left=1.25in,right=1.25in,bottom=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb,bm}
+\usepackage{booktabs,multirow}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{xcolor}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage[hidelinks]{hyperref}
+\usepackage{lineno}
+\usepackage{setspace}
+\usepackage[aboveskip=1pt,labelfont=bf,labelsep=period,justification=raggedright,singlelinecheck=off]{caption}
+\renewcommand{\figurename}{Fig}
+\input{../tables/numbers}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\vecop}{\operatorname{vec}}
+\newcommand{\clip}{\operatorname{clip}}
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+\raggedright
+\setlength{\parindent}{0.5cm}
+
+\begin{document}
+\vspace*{0.2in}
+\begin{flushleft}
+{\Large\textbf{Do plant-inspired operators help to train a pneumonia classifier? A controlled benchmark and component analysis of a hybrid Flower Pollination--Seed Dispersal algorithm}}
+\newline
+\\
+Mona Alsbakhi, Mohammed Lubbad, Mohammed Alhanjouri\textsuperscript{*}
+\\
+\bigskip
+Computer Engineering Department, Islamic University of Gaza, Gaza, Palestine
+\bigskip
+
+* mhanjouri@iugaza.edu.ps
+\end{flushleft}
+
+\section*{Abstract}
+Hybrids of nature-inspired metaheuristics are often proposed for training neural networks in medical imaging on the strength of a single favourable comparison. We examine one such design, a sequential hybrid of the Flower Pollination Algorithm (FPA) and a seed-dispersal algorithm (SDA), on the paediatric chest X-ray pneumonia dataset with a patient-grouped validation split, the official test folder (624 images), a common budget of 6,795 fitness evaluations, 50 paired runs and non-parametric statistics on three endpoints (training fitness, validation MCC and test MCC). On frozen ResNet-50 features with a 2048--16--2 classifier head the hybrid reaches a test MCC of \MCCHybrid{} (accuracy \ACCHybrid\%). It is better than FPA (\MCCFpa) and random search on every endpoint, reaches a worse training fitness than SDA alone in all 50 runs with a similar test MCC (\MCCSda), and is below GA (\MCCGa), PSO (\MCCPso) and L-SHADE (\MCCLShade). Lengthening the FPA phase gives a decreasing trend (Page's test $p=\PageP$). A redesigned hybrid that adds the FPA and SDA operators to a success-history differential-evolution framework, designed after these results were known, reaches \MCCAph{}, but L-SHADE without those operators attains a lower training fitness in most runs, and the redesign restricted to plant-inspired operators falls back to 0.382. On the original 138,530-dimensional PCA pipeline with standardised inputs, none of the seven gradient-free optimisers tested exceeds chance level. Logistic regression is best on frozen features (MCC \MCCLogreg). Fine-tuning the network by backpropagation raises accuracy to \FTOffAcc\% on the official test folder and \FTCvAcc\% under patient-grouped five-fold cross-validation; on fine-tuned features every optimiser, including the original hybrid (\CvHeadHybrid\%), lies between \CvHeadMin\% and \CvHeadMax\%. On this task the representation, not the optimiser, determines accuracy, and the plant-inspired operators bring no benefit over established components. Code, configurations and per-run outputs are released.
+
+\linenumbers
+
+%% ===========================================================================
+\section{Introduction}\label{sec:intro}
+
+Deep networks trained by gradient descent are the standard tool for medical image classification \citep{lecun2015deep,litjens2017survey}, and pneumonia detection on chest radiographs is a well-studied instance \citep{kermany2018,rajpurkar2017chexnet}. In parallel, a large literature trains or tunes networks with population-based metaheuristics \citep{ojha2017metaheuristic,stanley2019neuroevolution}, motivated by the non-convexity of the loss surface and by settings in which gradients are unavailable. Many recent contributions are hybrids of two metaphor-based algorithms evaluated on a single dataset against their own components. The evolutionary-computation community has repeatedly cautioned that such designs often recombine known operators under new names and are rarely compared against established methods under equal budgets \citep{sorensen2015metaphor,aranha2022callforaction,camacho2023exposing}.
+
+This study started from our own unpublished draft, which proposed a sequential hybrid of the Flower Pollination Algorithm \citep{yang2012fpa} and a seed-dispersal algorithm (FPA--SDA) for training a multilayer perceptron on PCA-reduced chest radiographs and presented it as the most accurate method tested; its notebook is included in the repository as the ``original implementation''. Re-examining that claim with a reproducible pipeline changed the conclusion: under equal budgets and paired statistics the hybrid is neither better than its second component nor competitive with standard metaheuristics or with gradient training. Rather than tune the method until it appears superior, this paper reports the controlled comparison and asks which components, if any, make a hybrid of this kind work.
+
+The contributions are:
+\begin{itemize}
+\item A reproducible benchmark of FPA, SDA and their sequential hybrid against GA, PSO, DE, L-SHADE, random search, evolution strategies, zeroth-order SGD and gradient-trained classifiers, on the official test split with a patient-grouped validation split, equal evaluation budgets and 50 paired runs (Sections~\ref{sec:methods}--\ref{sec:results}).
+\item A statistical analysis on three endpoints---training fitness, validation MCC and test MCC---with Friedman and Nemenyi tests, Holm-adjusted Wilcoxon tests, effect sizes and test-image bootstrap intervals, and a sensitivity study of the transition point $\tau$ (Section~\ref{sec:stats}).
+\item A redesigned hybrid (APH) that selects FPA and SDA operators adaptively inside a success-history DE framework, and an ablation showing that its gains depend on established DE components, while adding the plant-inspired operators to L-SHADE slightly worsens optimisation on this task (Section~\ref{sec:redesign}).
+\item Evidence on the original high-dimensional pipeline ($D=138{,}530$), on memetic variants that combine the hybrid with Adam, and on fine-tuned features under patient-grouped cross-validation, showing that the representation rather than the optimiser determines accuracy (Sections~\ref{sec:pca}, \ref{sec:finetune} and \ref{sec:discussion}).
+\end{itemize}
+
+%% ===========================================================================
+\section{Related work}\label{sec:related}
+
+\paragraph{Metaheuristic training of neural networks} Population-based optimisation of network weights has been studied for over three decades; \citet{ojha2017metaheuristic} review its use for feed-forward networks and \citet{stanley2019neuroevolution} survey neuroevolution more broadly. Two strands are relevant here. Large-scale gradient-free methods scale by exploiting structure: limited-memory matrix adaptation \citep{loshchilov2019lmmaes}, evolution strategies with antithetic sampling and rank shaping \citep{salimans2017es}, which have recently been applied to full-parameter fine-tuning of billion-parameter language models \citep{qiu2025esllm}, and zeroth-order SGD with two-point simultaneous-perturbation estimates \citep{spall1992spsa,malladi2023mezo}. Differential evolution \citep{storn1997de} with success-history parameter adaptation \citep{zhang2009jade,tanabe2013shade} and linear population-size reduction \citep{tanabe2014lshade} remains the reference design for bound-constrained black-box optimisation; strategy adaptation over several mutation operators was introduced by SaDE \citep{qin2009sade} and studied with probability matching and adaptive pursuit by \citet{gong2011strategy}. For network training specifically, \citet{piotrowski2014stagnation} showed that DE variants are prone to stagnation. Genetic algorithms have been shown to train deep networks competitively in reinforcement learning \citep{such2017deep}, and NeuroEvoBench provides standardised comparisons of evolutionary optimisers for deep learning \citep{lange2023neuroevobench}.
+
+\paragraph{Plant-inspired algorithms} FPA \citep{yang2012fpa} alternates Lévy-flight moves towards the best solution with differential local moves; numerous variants adjust the switch probability or step sizes \citep{abdelbasset2019fpareview}, and hybrids with differential evolution have been proposed \citep{song2024defpa}. Seed-dispersal mechanisms underlie the seed-based plant propagation algorithm \citep{sulaiman2015sbppa} and the Fertile Field Algorithm \citep{mohammadi2020ffa}. In medical applications FPA has been used to weight CNN ensembles \citep{zhou2025fpaensemble} and to train neuro-fuzzy predictors \citep{kaya2024fpaanfis}; metaheuristic feature selection and weight training on chest radiographs have also been reported \citep{elkenawy2021,almutairi2024}.
+
+\paragraph{Evaluation practice} Comparisons of stochastic optimisers require multiple independent runs, equal budgets, appropriately tuned competitors and non-parametric tests \citep{derrac2011tutorial,demsar2006,eiben2011parameter}. The no-free-lunch theorems \citep{wolpert1997nfl} imply that any claimed advantage is problem-specific and must be demonstrated against strong baselines on the problem at hand. The critique of metaphor-based metaheuristics \citep{sorensen2015metaphor,camacho2023exposing} adds that new algorithms should be described in standard terminology and their components evaluated separately \citep{lones2020metaphors}. Component-level analyses have shown that cuckoo search, another Lévy-flight method, adds no new ideas \citep{camacho2022cuckoo}, that several metaheuristics improve when components are removed \citep{piotrowski2018simplified}, and that the chimp optimisation algorithm is structurally biased \citep{deng2024chimp}. Section~\ref{sec:redesign} takes this approach.
+
+Table~\ref{tab:taxonomy} positions this study relative to these strands.
+
+\begin{table}[!t]
+\centering
+\caption{Positioning of this study.}
+\label{tab:taxonomy}
+\footnotesize
+\begin{tabular}{p{3.0cm}p{3.6cm}p{5.2cm}}
+\toprule
+Strand & Representative work & Gap addressed here \\
+\midrule
+Plant-inspired optimisers & \citet{yang2012fpa}; \citet{abdelbasset2019fpareview}; \citet{sulaiman2015sbppa} & Operators evaluated in isolation against DE-type components (ablation) \\
+FPA in medical AI & \citet{zhou2025fpaensemble}; \citet{kaya2024fpaanfis} & Weight training under equal budgets, paired runs, official test split \\
+Adaptive DE & \citet{zhang2009jade}; \citet{tanabe2013shade,tanabe2014lshade} & Used as strong baseline and as host framework for APH \\
+Large-scale gradient-free & \citet{salimans2017es}; \citet{malladi2023mezo}; \citet{qiu2025esllm} & Included as cross-field baselines \\
+Evaluation methodology & \citet{derrac2011tutorial}; \citet{demsar2006}; \citet{sorensen2015metaphor} & Applied throughout; component-level conclusions \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+%% ===========================================================================
+\section{Materials and methods}\label{sec:methods}
+
+\subsection{Data and splits}
+We use the Kermany paediatric chest X-ray dataset \citep{kermany2018} in its Kaggle distribution \citep{kaggle2018cxr}: 5,856 images (1,583 normal, 4,273 pneumonia). The official \emph{test} folder (234 normal, 390 pneumonia) is held out and used once per trained model. The official 16-image validation folder is merged into the training folder, which is then split by patient into an optimisation subset (4,186 images; 1,079/3,107) and a validation subset (1,046; 270/776) with a stratified group split, so that no patient contributes to both. Patient identifiers are parsed from file names. All fitness evaluations use the optimisation subset only; the validation subset is used for reporting and the test set for final evaluation. Of the 431 patient identifiers in the test folder, 170 also occur in the training folder; since no test image has a cosine similarity above 0.931 to any training image in the ResNet-50 feature space, these are probably independent numberings, but cross-split patient overlap cannot be excluded from file names alone. The test folder contains six near-identical image pairs (cosine similarity $>0.99$), which are kept to preserve the official split.
+
+\subsection{Feature pipelines}
+\emph{CNN features (main experiments).} Each image is converted to three identical channels, resized to $224\times224$ and passed through an ImageNet-pretrained ResNet-50 \citep{he2016resnet,deng2009imagenet} with frozen weights; the 2048-dimensional global-average-pooled output is standardised with statistics of the optimisation subset.
+\emph{PCA features (original pipeline).} Images are resized to $150\times150$, scaled to $[0,1]$, flattened ($22{,}500$ values) and projected onto the first 1,000 principal components of the optimisation subset, either as raw scores (as in the original implementation) or standardised.
+
+\subsection{Network and solution encoding}
+A fully connected network with ReLU hidden layers and a two-unit softmax output maps a feature vector $\mathbf{a}^{(0)}\in\R^{d}$ to class probabilities. For layers $l=1,\dots,L$ with weights $W^{(l)}\in\R^{n_{l-1}\times n_l}$ and biases $\mathbf{b}^{(l)}\in\R^{n_l}$, every candidate solution is the concatenation
+\begin{equation}
+\begin{gathered}
+\mathbf{x}=\left[\vecop(W^{(1)})^{\top},\dots,\vecop(W^{(L)})^{\top},(\mathbf{b}^{(1)})^{\top},\dots,(\mathbf{b}^{(L)})^{\top}\right]^{\top}\in\R^{D},\\
+D=\sum_{l=1}^{L}n_l\,(n_{l-1}+1),
+\end{gathered}
+\label{eq:encoding}
+\end{equation}
+with all weight matrices first and all bias vectors last, exactly as in the implementation. For the CNN head ($2048$--$16$--$2$, $L=2$) $D=32{,}818$; for the original PCA network ($1000$--$128$--$64$--$32$--$2$, $L=4$) $D=128{,}128+8{,}256+2{,}080+66=138{,}530$. All search methods operate in the box $[lb,ub]^D=[-1,1]^D$ and initialise uniformly within it.
+
+\subsection{Fitness function}
+Given $m$ optimisation images with labels $y_i\in\{0,1\}$ and predicted class probabilities $\hat p_{i,c}(\mathbf{x})$, the fitness to be minimised is the class-weighted cross-entropy plus an $L_2$ penalty on the weights,
+\begin{align}
+f(\mathbf{x}) &= \mathcal{L}_{\mathrm{CE}}(\mathbf{x})+\mathcal{L}_{L_2}(\mathbf{x}),\label{eq:fitness}\\
+\mathcal{L}_{\mathrm{CE}}(\mathbf{x}) &= -\frac{1}{m}\sum_{i=1}^{m} w_{y_i}\log \hat p_{i,y_i}(\mathbf{x}),\qquad w_c=\frac{m}{2\,m_c},\label{eq:ce}\\
+\mathcal{L}_{L_2}(\mathbf{x}) &= \frac{\lambda}{2m}\sum_{l=1}^{L}\sum_{j,k}\bigl(W^{(l)}_{jk}\bigr)^2,\qquad \lambda=10^{-3},\label{eq:l2}
+\end{align}
+where $m_c$ is the number of class-$c$ images. Eq.~\eqref{eq:ce} is the two-class softmax form of binary cross-entropy with balanced class weights; log-probabilities are computed with a numerically stable log-sum-exp.
+
+\subsection{Flower Pollination Algorithm}
+At iteration $t$, flower $i$ produces a candidate $\mathbf{v}_i$ by global pollination with probability $p=0.8$ and by local pollination otherwise:
+\begin{align}
+\mathbf{v}_i &= \mathbf{x}_i^{(t)}+\gamma\,\mathbf{L}\odot\bigl(\mathbf{g}^{*}-\mathbf{x}_i^{(t)}\bigr),\label{eq:fpa_global}\\
+\mathbf{v}_i &= \mathbf{x}_i^{(t)}+\bm{\epsilon}\odot\bigl(\mathbf{x}_j^{(t)}-\mathbf{x}_k^{(t)}\bigr),\qquad \bm{\epsilon}\sim U(0,1)^D,\ j\neq k,\label{eq:fpa_local}
+\end{align}
+where $\mathbf{g}^{*}$ is the best solution found so far and $\odot$ denotes element-wise multiplication. Eq.~\eqref{eq:fpa_global} uses the direction from $\mathbf{x}_i$ to $\mathbf{g}^{*}$, as in Yang's pseudocode \citep{yang2012fpa}; because the Lévy step is symmetric, each coordinate moves towards or away from $\mathbf{g}^{*}$ with equal probability. The implementation used throughout uses $\gamma=1$. Each component of the Lévy step $\mathbf{L}\in\R^D$ is drawn with Mantegna's algorithm \citep{mantegna1994} with $\beta=1.5$:
+\begin{equation}
+\begin{gathered}
+L_d=\frac{u_d}{|v_d|^{1/\beta}},\quad u_d\sim\mathcal{N}(0,\sigma_u^2),\ v_d\sim\mathcal{N}(0,1),\\[2pt]
+\sigma_u=\left[\frac{\Gamma(1+\beta)\sin(\pi\beta/2)}{\Gamma\!\left(\frac{1+\beta}{2}\right)\beta\,2^{(\beta-1)/2}}\right]^{1/\beta}.
+\end{gathered}
+\label{eq:mantegna}
+\end{equation}
+Candidates are clipped to $[lb,ub]$ and replace $\mathbf{x}_i$ only if strictly better (greedy, in-place selection); $\mathbf{g}^{*}$ is updated immediately.
+
+\subsection{Seed-dispersal algorithm}
+Each seed applies one of three dispersal operators, chosen with probabilities $(P_{\mathrm{wind}},P_{\mathrm{animal}},P_{\mathrm{gravity}})=(0.70,0.15,0.15)$:
+\begin{align}
+\text{wind:}\quad & \mathbf{v}_i=\mathbf{x}_i^{(t)}+\mathbf{L}\odot\bigl(\mathbf{g}^{*}-\mathbf{x}_i^{(t)}\bigr),\label{eq:wind}\\
+\text{animal:}\quad & \mathbf{v}_i=\mathbf{x}_i^{(t)}+\bm{\epsilon}\odot\bigl(\mathbf{x}_r^{(t)}-\mathbf{x}_i^{(t)}\bigr),\qquad \bm{\epsilon}\sim U(0,1)^D,\ r\sim U\{1,\dots,n\},\label{eq:animal}\\
+\text{gravity:}\quad & \mathbf{v}_i=\mathbf{x}_i^{(t)}+\mathbf{s},\qquad \mathbf{s}\sim U(-0.1,0.1)^D,\label{eq:gravity}
+\end{align}
+followed by clipping and the same strictly-better greedy selection. With $\gamma=1$ the FPA global operator \eqref{eq:fpa_global} and the SDA wind operator \eqref{eq:wind} are identical; FPA and SDA therefore differ only in their remaining operators and in the probability of the Lévy move ($0.8$ versus $0.7$). Our original draft attributed these operators to two prior publications that we could not verify; the operators are therefore documented here exactly as implemented, and seed-dispersal-inspired optimisers in the literature are cited for context only \citep{sulaiman2015sbppa,mohammadi2020ffa}.
+
+\subsection{Sequential hybrid FPA--SDA}\label{sec:hybrid}
+The hybrid runs FPA for $\tau$ iterations and SDA for the remaining $T-\tau$ iterations ($T=150$, $\tau=75$, $n=45$). Let $\mathbf{x}^{*}_{\mathrm{FPA}}$ denote the best solution after phase 1 and $\{\mathbf{x}_i^{(\tau)}\}$ the phase-1 population. Two transition operators are studied.
+
+\emph{Transfer (original implementation).} The SDA phase starts from the final FPA population unchanged:
+\begin{equation}
+\mathbf{x}_i^{(\tau^{+})}=\mathbf{x}_i^{(\tau)},\qquad i=1,\dots,n.
+\label{eq:transfer}
+\end{equation}
+
+\emph{Re-initialisation around the elite.} The elite is kept and the other $n-1$ seeds are resampled around it with controlled diversity:
+\begin{equation}
+\begin{gathered}
+\mathbf{x}_1^{(\tau^{+})}=\mathbf{x}^{*}_{\mathrm{FPA}},\\
+\mathbf{x}_i^{(\tau^{+})}=\clip\!\Bigl(\mathbf{x}^{*}_{\mathrm{FPA}}+\sigma_{\mathrm{init}}\,\mathbf{z}_i,\;lb,\;ub\Bigr),\quad \mathbf{z}_i\sim\mathcal{N}(\mathbf{0},\mathbf{I}_D),\quad i=2,\dots,n,
+\end{gathered}
+\label{eq:reinit}
+\end{equation}
+with $\sigma_{\mathrm{init}}=0.05\,(ub-lb)=0.1$. The $n-1$ new seeds are evaluated and the SDA phase is shortened by one iteration, so the transfer variant uses $n(T+1)=6{,}795$ evaluations and the re-initialisation variant \EvalsReinit{} (the elite is not re-evaluated). Our original draft described Eq.~\eqref{eq:reinit} while its code implemented Eq.~\eqref{eq:transfer}; both are therefore reported. Algorithm~\ref{alg:hybrid} gives the complete procedure.
+
+\begin{algorithm}[!t]
+\caption{Sequential hybrid FPA--SDA for network-weight optimisation}\label{alg:hybrid}
+\footnotesize
+\begin{algorithmic}[1]
+\Require features $X\in\R^{m\times d}$ (PCA or CNN), labels $\mathbf{y}$; layer sizes $(n_0{=}d,\dots,n_L{=}2)$;\Statex \hspace{\algorithmicindent} $n{=}45$, $T{=}150$, $\tau{=}75$, $p{=}0.8$, $(P_{\mathrm{wind}},P_{\mathrm{animal}},P_{\mathrm{gravity}}){=}(0.70,0.15,0.15)$;\Statex \hspace{\algorithmicindent} $[lb,ub]{=}[-1,1]$, $\lambda{=}10^{-3}$, $\sigma_{\mathrm{init}}{=}0.1$, mode $\in\{\textsc{transfer},\textsc{reinit}\}$
+\Ensure network parameters $\mathbf{x}^{*}\in\R^{D}$, $D$ from Eq.~\eqref{eq:encoding}
+\State \textbf{for} $i=1..n$: $\mathbf{x}_i\sim U(lb,ub)^D$; decode $\mathbf{x}_i\mapsto\{W^{(l)},\mathbf{b}^{(l)}\}$; $f_i\gets f(\mathbf{x}_i)$ \Comment{Eqs.~\eqref{eq:encoding}--\eqref{eq:l2}}
+\State $\mathbf{g}^{*}\gets\arg\min_i f_i$
+\For{$t=1$ \textbf{to} $\tau$} \Comment{Phase 1: FPA}
+  \For{$i=1$ \textbf{to} $n$}
+    \If{$U(0,1)<p$} \State $\mathbf{v}\gets$ global pollination, Eqs.~\eqref{eq:fpa_global}--\eqref{eq:mantegna}
+    \Else \State $\mathbf{v}\gets$ local pollination, Eq.~\eqref{eq:fpa_local}
+    \EndIf
+    \State $\mathbf{v}\gets\clip(\mathbf{v},lb,ub)$; \textbf{if} $f(\mathbf{v})< f_i$ \textbf{then} $(\mathbf{x}_i,f_i)\gets(\mathbf{v},f(\mathbf{v}))$; update $\mathbf{g}^{*}$
+  \EndFor
+\EndFor
+\State $T_2\gets T-\tau$
+\If{mode $=\textsc{reinit}$} \Comment{Phase transition, Eq.~\eqref{eq:reinit}}
+  \State $\mathbf{x}_1\gets\mathbf{g}^{*}$; \textbf{for} $i=2..n$: $\mathbf{x}_i\gets\clip(\mathbf{g}^{*}+\sigma_{\mathrm{init}}\mathbf{z}_i,lb,ub)$, $f_i\gets f(\mathbf{x}_i)$; \ $T_2\gets T_2-1$
+\EndIf \Comment{mode \textsc{transfer}: population kept, Eq.~\eqref{eq:transfer}}
+\For{$t=1$ \textbf{to} $T_2$} \Comment{Phase 2: SDA}
+  \For{$i=1$ \textbf{to} $n$}
+    \State $r\sim U(0,1)$
+    \If{$r<0.70$} \State $\mathbf{v}\gets$ wind dispersal, Eq.~\eqref{eq:wind}
+    \ElsIf{$r<0.85$} \State $\mathbf{v}\gets$ gravity dispersal, Eq.~\eqref{eq:gravity}
+    \Else \State $\mathbf{v}\gets$ animal dispersal, Eq.~\eqref{eq:animal}
+    \EndIf
+    \State $\mathbf{v}\gets\clip(\mathbf{v},lb,ub)$; \textbf{if} $f(\mathbf{v})< f_i$ \textbf{then} $(\mathbf{x}_i,f_i)\gets(\mathbf{v},f(\mathbf{v}))$; update $\mathbf{g}^{*}$
+  \EndFor
+\EndFor
+\State \Return $\mathbf{x}^{*}\gets\mathbf{g}^{*}$
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Redesigned hybrid: Adaptive Plant Hybrid (APH)}\label{sec:aph}
+The benchmark (Section~\ref{sec:results}) suggests three weaknesses of the sequential design: a fixed, harmful phase schedule; operators that perturb all $D$ coordinates at once; and fixed parameters. APH replaces phase-level by operator-level hybridisation. In each generation every individual draws one of four operators,
+\begin{align*}
+\text{O1 (FPA global)}:\ & \mathbf{v}=\mathbf{x}_i+F\,\clip(\mathbf{L},-3,3)\odot(\mathbf{g}^{*}-\mathbf{x}_i)\\
+\text{O2 (FPA local)}:\ & \mathbf{v}=\mathbf{x}_i+F\,(\mathbf{x}_j-\mathbf{x}_k)\\
+\text{O3 (SDA animal, current-to-}p\text{best)}:\ & \mathbf{v}=\mathbf{x}_i+F\,(\mathbf{x}_{p\mathrm{best}}-\mathbf{x}_i)+F\,(\mathbf{x}_{r_1}-\tilde{\mathbf{x}}_{r_2})\\
+\text{O4 (SDA gravity)}:\ & \mathbf{v}=\mathbf{x}_i+F\,\mathbf{s}\odot\mathbf{z},\quad \mathbf{z}\sim\mathcal{N}(\mathbf{0},\mathbf{I}),
+\end{align*}
+where $\mathbf{x}_{p\mathrm{best}}$ is drawn from the best $11\%$, $\tilde{\mathbf{x}}_{r_2}$ from the population plus an archive of replaced parents, and $\mathbf{s}$ is the per-coordinate population standard deviation. The candidate is combined with $\mathbf{x}_i$ by binomial crossover with rate $CR$, so only part of the weight vector changes. $F$ and $CR$ are sampled from success-history memories (Cauchy and normal, respectively, $H=6$) updated with weighted Lehmer and arithmetic means \citep{tanabe2013shade}; operator probabilities follow probability matching on relative improvement with a floor of $0.05$ \citep{thierens2005aos}; the population shrinks linearly from 45 to 4 \citep{tanabe2014lshade}. O3 is the current-to-$p$best/1 mutation of JADE \citep{zhang2009jade}; the ablation in Section~\ref{sec:redesign} isolates its contribution.
+
+\subsection{Comparators}
+All gradient-free methods receive $n(T+1)=6{,}795$ fitness evaluations (\EvalsReinit{} for the re-initialisation variant of the hybrid), start from the same uniform population (shared random seed per run) and use the same bounds; parameters are listed in Table~\ref{tab:params}:
+random search (uniform resampling with per-slot replacement);
+GA (steady-state, binary tournament, BLX-$\alpha$ crossover with $\alpha=0.5$, Gaussian mutation, worst replacement);
+PSO with constriction coefficients \citep{kennedy1995pso,clerc2002constriction};
+DE/rand/1/bin with $F=0.5$, $CR=0.9$ \citep{storn1997de};
+L-SHADE \citep{tanabe2014lshade};
+OpenAI-ES with antithetic sampling, centred-rank shaping and Adam ($\sigma=0.02$, learning rate $0.01$) \citep{salimans2017es};
+and ZO-SGD with two-point SPSA estimates \citep{spall1992spsa,malladi2023mezo}.
+Memetic variants spend half the budget on the hybrid or APH and then apply 300 full-batch Adam steps \citep{kingma2015adam} (learning rate $10^{-3}$) using exact gradients of Eq.~\eqref{eq:fitness}; the Adam-only control applies the same steps to the best of the 45 uniform initial solutions.
+Gradient-trained references are logistic regression and an MLP of the same architecture trained by backpropagation with Adam or SGD with momentum and early stopping \citep{pedregosa2011sklearn}, plus the majority-class predictor. The finite-difference ``SGD'' baseline of our original draft is not used: it estimated gradients on 1,000 random coordinates per step and is not representative of gradient training.
+
+\subsection{Fine-tuning, cross-validation and head training on fine-tuned features}\label{sec:ftmethods}
+To separate the effect of the representation from that of the optimiser, the ResNet-50 was also fine-tuned end to end by backpropagation: AdamW \citep{loshchilov2019adamw} with a one-cycle learning-rate schedule (peak $3\times10^{-4}$), weight decay $10^{-4}$, 12 epochs, batch size 64, class-weighted cross-entropy and mixed precision; images are stored at $256\times256$ and augmented to $224\times224$ by random scaling (0.85--1), rotation ($\pm10^{\circ}$), translation and brightness and contrast jitter. The epoch is selected by validation MCC and the held-out data are evaluated once per model. Two protocols are used: (i) the official split, with five seeds; and (ii) patient-grouped five-fold cross-validation over all 5,856 images (\CvPatients{} patient identifiers; identifiers that occur in both official folders are kept in one fold), with an inner patient-grouped split of the training folds (one eighth) for epoch selection, and three seeds. These hyperparameters were fixed before the cross-validation and were not tuned on it. Models were trained on an NVIDIA A100 with PyTorch 2.14.1.
+
+For the seed-0 model of each fold, the 2048-dimensional penultimate features were extracted and the 2048--16--2 head was trained by each optimiser (\CvHeadRuns{} runs per fold, new seeds). In these runs the gradient-free optimisers search a Glorot-scaled space, $\bm\theta=\mathbf{s}\odot\mathbf{z}$ with $\mathbf{z}\in[-1,1]^D$ and $\mathbf{s}$ equal to twice the Glorot-uniform limit of each layer \citep{glorot2010}; the hybrid is also run in the original $[-1,1]^D$ box.
+
+\subsection{Protocol and statistical analysis}\label{sec:protocol}
+Each method is run 50 times (20 for the $\tau$ study and the ablation, 10 for the PCA pipeline) with run-indexed seeds shared across methods, giving paired samples. Three endpoints are analysed. Optimisers are compared on the final training fitness, which is the quantity they minimise, and on validation MCC; classifiers are compared on the test set by accuracy, balanced accuracy, sensitivity, specificity and Matthews correlation coefficient (MCC), all computed from one confusion matrix at a threshold of 0.5, and by ROC AUC computed from the predicted probabilities. Methods are compared with the Friedman test \citep{friedman1937} followed by the Nemenyi post-hoc test with critical difference $\mathrm{CD}=q_{\alpha}\sqrt{k(k+1)/(6N)}$ \citep{demsar2006}, and pairwise with the Wilcoxon signed-rank test \citep{wilcoxon1945} with Holm correction \citep{holm1979}; effect sizes are reported as the Vargha--Delaney $\hat A$ statistic \citep{vargha2000}. Two effect measures are reported: $\bar\Delta$, the difference of means, and $\tilde\Delta$, the median of paired differences. A monotone trend over the transition point is tested with Page's $L$ test \citep{page1963trend}. Because all runs are evaluated on the same 624 test images, $p$-values across seeds do not capture test-set sampling uncertainty; we therefore also resample test images with replacement (2,000 bootstrap samples, seeds held fixed) and report 95\% intervals for key differences, recomputed from the stored predictions. The protocol follows \citet{derrac2011tutorial}.
+
+\emph{Design history.} The experiments were not all planned in advance, and the order matters for interpretation. (i) The original PCA pipeline was run first; after a one-run pilot showed the gradient-free optimisers at chance level, its run count was fixed at 10. (ii) The CNN-feature task was then introduced, with eight gradient-free optimisers (FPA, SDA, the two hybrids, random search, PSO, DE, GA) and the gradient-trained references, 50 runs each, followed by the $\tau$ study. (iii) APH, the memetic variants, and the additional baselines L-SHADE, OpenAI-ES and ZO-SGD were added afterwards, with knowledge of the earlier results including test-set metrics; a five-run pilot of these methods used seeds 0--4, and those runs are part of the 50 reported. (iv) The analysis of training fitness and validation MCC, the fine-tuning experiments and the Glorot-scaled search space (Section~\ref{sec:ftmethods}) were added after independent review of a draft; these use seeds not used before, and their settings were fixed before they were run. Results for the methods in (iii) and (iv) are exploratory; the Friedman test over the eight optimisers of step (ii) alone gives $\chi^2_F=\FriedmanEightChi$, $p=\FriedmanEightP$.
+
+\subsection{Implementation and reproducibility}
+All methods are implemented in Python 3.13 with NumPy 2.5, SciPy 1.18 and scikit-learn 1.9; Frozen ResNet-50 features are extracted with PyTorch 2.15.0 and torchvision 0.29.2 (CPU) using the \texttt{IMAGENET1K\_V2} weights. Each (method, run) pair writes a JSON file containing the configuration, seed, convergence history, evaluation count, run time, validation and test metrics and the test-set probabilities; every table and figure in this paper is generated from these files by a single script. Run times were measured on a 4-core cloud CPU with four runs executing concurrently, one thread each, and are indicative only. Code, configurations and all per-run outputs are available at \citet{alsbakhi2026code}.
+
+%% ===========================================================================
+\section{Results}\label{sec:results}
+
+\subsection{Original pipeline: PCA features, $D=138{,}530$}\label{sec:pca}
+Table~\ref{tab:pca} reports the original high-dimensional setting. With raw PCA scores, as in the original implementation, SDA alone reaches 68.5\% accuracy, the hybrid 60.4\% and FPA 56.5\%; the hybrid is therefore not the most accurate method in the original setting either. With standardised scores all seven gradient-free optimisers run on this pipeline (FPA, SDA, the two hybrids, PSO, DE and GA) and random search are at chance level (AUC 0.50--0.52), and their median best training fitness (e.g.\ SDA 0.82, hybrid 1.19) remains above $\ln 2\approx0.69$, the loss of a constant predictor; logistic regression and the backpropagation-trained MLPs reach \MlpSgdPcaAcc--74.4\%. L-SHADE, APH, OpenAI-ES and ZO-SGD were not run on this pipeline. Because SDA reaches MCC 0.347 at the same dimension with raw scores, dimension alone does not explain the failure; input scaling, the search box and the budget may all contribute, but none of them was varied here. The remaining experiments use the CNN head.
+
+\input{../tables/pca}
+
+\subsection{Main benchmark: CNN features, $D=32{,}818$}
+Table~\ref{tab:cnn_main} and Fig~\ref{fig:box} summarise 50 runs per method. Among gradient-free optimisers, L-SHADE (\MCCLShade), APH (\MCCAph) and GA (\MCCGa) lead, followed by PSO (\MCCPso) and DE (\MCCDe). The two variants of the hybrid (\MCCHybrid{} and \MCCHybridReinit) are close to SDA (\MCCSda) and ahead of FPA (\MCCFpa) and random search (\MCCRandom). All gradient-free methods are below the gradient-trained references: logistic regression (\MCCLogreg, accuracy \ACCLogreg\%) and the MLP trained with Adam (\MCCMlpAdam). Rankings on the validation subset agree with the test set (Spearman $\rho=\ValTestRho$ across 16 methods), but absolute specificity does not: logistic regression reaches \LRValSpec\% specificity on validation and \LRTestSpec\% on test, consistent with a distribution shift between the official training and test folders. Fig~\ref{fig:confusion} shows the confusion matrices of the median runs. All four methods misclassify 41--47\% of the normal radiographs; the hybrid differs mainly in missed pneumonia cases (85 false negatives, against 29 for GA, 25 for APH and 7 for the MLP).
+
+\input{../tables/cnn_main}
+
+\begin{figure}[!h]
+\caption{Test MCC over 50 runs on CNN features. Grey: gradient-free optimisers; blue: methods using gradients. Diamonds mark means.}
+\label{fig:box}
+\end{figure}
+
+\begin{figure}[!h]
+\caption{Test confusion matrices (rows: true, columns: predicted; N = normal, P = pneumonia) of the median-MCC run of each method. Accuracy and MCC are computed from the displayed cells.}
+\label{fig:confusion}
+\end{figure}
+
+\subsection{Statistical significance}\label{sec:stats}
+The Friedman test rejects equal performance of the ten gradient-free optimisers ($\chi^2_F=\FriedmanChi$, $p=\FriedmanP$; Table~\ref{tab:friedman}). In the critical-difference diagram (Fig~\ref{fig:cd}) the groups of methods that are not significantly different are \CDGroups; the two hybrids are thus separated from L-SHADE, APH, GA and PSO but not from DE, SDA or FPA. Pairwise tests on test MCC (Table~\ref{tab:wilcoxon}) show that the hybrid improves on FPA ($\bar\Delta=+0.090$, $\hat A=0.75$) and random search, is below PSO, GA and L-SHADE with large effects ($\hat A\le0.08$) and below DE with a medium effect ($\hat A=0.34$; not separated by the Nemenyi test), and does not differ from SDA or from its re-initialisation variant. SDA is better than FPA ($\bar\Delta=\SdaFpaDelta$).
+
+Test MCC is, however, a noisy endpoint for comparing optimisers: it is evaluated at a fixed threshold on a test folder whose distribution differs from the training data. Tables~\ref{tab:endpoints} and \ref{tab:contrasts} therefore add the final training fitness and validation MCC. Three statements change. First, SDA reaches a lower training fitness than the hybrid in all 50 runs (median \FitSda{} against \FitHybrid) and a higher validation MCC (\ValSda{} against \ValHybrid): the hybrid is a worse optimiser than its second component, not an equivalent one. Second, the transfer variant reaches a lower fitness than the re-initialisation variant in all 50 runs, although their MCC values do not differ. Third, the hybrid reaches a lower training fitness than DE in \WinFitHybridde{} of 50 runs (median \FitHybrid{} against \FitDe) while DE has the higher validation and test MCC, so the ordering of these two depends on the endpoint. Lower training loss does not imply higher test MCC across methods.
+
+Test-set sampling uncertainty is also substantial: the 95\% interval of a single model's MCC is about $\pm\OneModelLo$ to $\pm\OneModelHi$. For run-averaged differences (Table~\ref{tab:bootstrap}) the contrasts hybrid--FPA, L-SHADE--GA, APH--GA and logistic regression--L-SHADE remain resolved, whereas hybrid--SDA, APH--L-SHADE, MLP--APH and memetic APH--MLP are not. Restricting the test set to the \NoOverlapN{} images whose patient identifier does not occur in the training folder preserves the ranking of methods (Spearman $\rho=\NoOverlapRho$), and the sensitivity of logistic regression is the same on pneumonia images with and without an overlapping identifier (\LRSensOverlap\% and \LRSensOther\%), so there is no sign of memorised patients.
+
+\input{../tables/friedman}
+
+\begin{figure}[!h]
+\caption{Critical-difference diagram (Nemenyi, $\alpha=0.05$, $N=50$) for test MCC. Methods joined by a bar are not significantly different; $\mathrm{CD}=\CDvalue$.}
+\label{fig:cd}
+\end{figure}
+
+\input{../tables/wilcoxon}
+
+\input{../tables/endpoints}
+
+\input{../tables/contrasts}
+
+\input{../tables/bootstrap}
+
+\subsection{Transition point}
+Table~\ref{tab:tau} and Fig~\ref{fig:tau} vary $\tau$ while keeping $T=150$; SDA alone ($\tau=0$) and FPA alone ($\tau=150$) are included with the same seeds. Mean MCC falls from 0.381 (SDA alone) and 0.380 ($\tau=25$) to 0.235 ($\tau=125$) and 0.243 (FPA alone). Page's test confirms a decreasing trend ($L=\PageL$, $p=\PageP$), but no pair of adjacent settings differs significantly (smallest $p_{\mathrm{Holm}}=\TauAdjMin$) and none of the 20 individual runs decreases monotonically. The value $\tau=75$ used in our original draft is not an optimum, and no hybrid schedule improves on SDA alone.
+
+\input{../tables/tau}
+
+\begin{figure}[!h]
+\caption{Test MCC of the hybrid as a function of the transition iteration $\tau$ (20 runs each; line: means).}
+\label{fig:tau}
+\end{figure}
+
+\subsection{Redesign and ablation}\label{sec:redesign}
+APH raises the hybrid's test MCC from \MCCHybrid{} to \MCCAph{} ($\bar\Delta=+0.232$, $\hat A=0.99$) and is ahead of GA on all three endpoints (Table~\ref{tab:contrasts}), PSO and DE. Compared with L-SHADE, which uses the same framework without the plant-inspired operators, test MCC does not differ ($p_{\mathrm{Holm}}=0.42$), but APH reaches a lower training fitness in only \WinFitAphlShade{} of 50 runs (median \FitAph{} against \FitLshade) and a lower validation MCC (\ValAph{} against \ValLshade): adding the FPA and SDA operators to L-SHADE slightly worsens optimisation on this task. APH is an instance of adaptive strategy selection in DE \citep{qin2009sade,gong2011strategy} with four extra operators and is not proposed as a new algorithm.
+
+The ablation (Table~\ref{tab:ablation}) locates the source of APH's advantage over the original hybrid. Removing binomial crossover and replacing adaptive operator selection by uniform probabilities cost about the same (\AblNoCx{} and \AblUniform; the two variants do not differ, $p=\AblUniformVsNoCx$), and both intervals exclude zero on the test-image bootstrap. Removing the current-to-$p$best operator---leaving only the FPA and SDA operators, with all adaptation mechanisms intact---costs far more (\AblPlant) and returns MCC to 0.382, the level of the original hybrid. The operator-selection mechanism allocates \ShareAnimal\% of all trials to that operator, against \ShareLocal\% (FPA local), \ShareGravity\% (SDA gravity) and \ShareGlobal\% (FPA global). The contributions of SHADE parameter adaptation and population-size reduction were not ablated. As stated in Section~\ref{sec:protocol}, these comparisons are exploratory. The cross-field methods OpenAI-ES and ZO-SGD reach MCC 0.40 and 0.39 at this budget.
+
+\input{../tables/ablation}
+
+\subsection{Memetic variants and convergence}
+Using the hybrid as an initialiser for Adam (memetic) improves on Adam started from the best of the same random population (\MCCMemeticHybrid{} vs \MCCAdamOnly, $\hat A=0.92$), and APH+Adam reaches \MCCMemeticAph. Neither surpasses the MLP trained by standard backpropagation with standard initialisation (\MCCMlpAdam; Table~\ref{tab:wilcoxon}). The benefit of the metaheuristic phase is therefore relative to a poor uniform initialisation in $[-1,1]^D$ rather than to gradient training as normally practised. Fig~\ref{fig:conv} shows that the hybrid's fitness remains above that of GA, L-SHADE and APH throughout. The transition at $\tau=75$ is followed by a marked acceleration: the median log-fitness decreases by \SlopePre{} per iteration over iterations 50--75 and by \SlopePost{} over iterations 75--100 (\SlopeRatio$\times$), consistent with the SDA phase driving most of the progress. Per-run times are 36--60\,s for all gradient-free optimisers, against about 1\,s for the gradient-trained MLP.
+
+\begin{figure}[!h]
+\caption{Best-so-far fitness (median and inter-quartile range over 50 runs); dashed line: $\tau=75$.}
+\label{fig:conv}
+\end{figure}
+
+\subsection{Fine-tuned features and cross-validation}\label{sec:finetune}
+Table~\ref{tab:finetune} reports end-to-end fine-tuning. On the official split, accuracy on the test folder is \FTOffAcc\% (\FTOffMin--\FTOffMax\% over five seeds), against \ACCLogreg\% for the best classifier on frozen features; specificity is \FTOffSpec\%, while accuracy on the validation subset is \FTValAcc\%. Under patient-grouped cross-validation, pooled out-of-fold accuracy is \FTCvAcc\% with a specificity of \FTCvSpec\%. Out-of-fold accuracy is \FTCvAccTrainFolder\% for images from the official training folder and \FTCvAccTestFolder\% for images from the official test folder: the test folder is harder even when its images take part in training, which confirms a distribution difference between the two folders. The two protocols answer different questions, and the cross-validated figure must not be compared with results reported on the official test folder.
+
+\input{../tables/finetune}
+
+Table~\ref{tab:cvhead} reports the 2048--16--2 head trained by each optimiser on the fine-tuned features inside the cross-validation. All methods lie between \CvHeadMin\% and \CvHeadMax\% accuracy. The original hybrid reaches \CvHeadHybrid\% in the Glorot-scaled space and \CvHeadHybridBox\% in the $[-1,1]$ box, against \CvHeadLshade\% for L-SHADE, \CvHeadMlp\% for the backpropagation-trained MLP and \CvHeadLogreg\% for logistic regression. With a representation in which the classes are almost linearly separable, the differences between optimisers that dominate the frozen-feature benchmark shrink to about one percentage point. They remain systematic: across the 50 fold--run pairs the hybrid is below GA, L-SHADE and the gradient-trained classifiers and above FPA ($p_{\mathrm{Holm}}\le0.001$), and it does not differ from SDA (Friedman over the six gradient-free variants $p=\CvHeadFriedmanP$).
+
+\input{../tables/cvhead}
+
+%% ===========================================================================
+\section{Discussion}\label{sec:discussion}
+
+\paragraph{Why the sequential hybrid does not help} With $\gamma=1$, FPA's global operator and SDA's wind operator are the same Lévy move, so FPA and SDA differ only in their remaining operators (FPA's differential local move versus SDA's animal and gravity dispersal) and in how often the Lévy move is used. SDA outperforms FPA, the hybrid's fitness improves much faster once the SDA phase starts, and no hybrid schedule improves on SDA alone; the hybrid therefore inherits the performance of its second phase. We did not ablate SDA's individual operators, so which of them is responsible remains open. A further factor is that all FPA and SDA operators perturb every coordinate; in APH, however, removing crossover reduced MCC by only about 0.03, so partial moves explain a small part of the gap. The decisive component in our ablation is the current-to-$p$best direction. The search box $[-1,1]^D$, inherited from the original implementation, is much wider than standard weight initialisations; its effect on the frozen-feature benchmark was not tested.
+
+\paragraph{Relation to the metaphor debate} Our redesign followed the usual path of improving a hybrid by adding adaptive mechanisms, and it produced a method that appears better than GA and PSO. Without the ablation, it would have been easy to present APH as a new, superior plant-inspired algorithm. The analysis shows instead that APH optimises slightly worse than L-SHADE and that it owes its advantage over the original hybrid to a DE operator; its plant-inspired operators, although selected in \SharePlant\% of trials, bring no benefit on this task, illustrating at the component level the concern raised by \citet{sorensen2015metaphor} and \citet{camacho2023exposing}. We recommend that hybrid metaheuristics proposed for neural-network training be accompanied by (i) equal-budget comparisons with L-SHADE or CMA-type baselines, (ii) operator-removal ablations and (iii) paired statistics.
+
+\paragraph{Representation versus optimiser} At equal or lower cost, gradient-based training produced the best classifiers on frozen features: logistic regression reached 82.7\% accuracy and the MLP an AUC of 0.937 in about one second, compared with 36--60\,s for gradient-free optimisers. Fine-tuning the network, which is itself gradient training, moved accuracy much further than any change of optimiser, and on the fine-tuned features the original hybrid is within about one percentage point of every other method (Section~\ref{sec:finetune}). For this application the useful question is therefore how to obtain a good representation, not which metaheuristic trains the last layers. On frozen features the stronger methods show high sensitivity but modest specificity (at most about 60\%) on the test folder, while specificity on the validation subset is much higher (\LRValSpec\% for logistic regression); together with the cross-validation result this points to a distribution difference between the official folders, and threshold calibration and external validation would be required before any clinical use. Gradient-free training remains defensible where gradients are genuinely unavailable---non-differentiable objectives, quantised or hardware-in-the-loop models---and these settings, not standard supervised training, are where plant-inspired operators would need to be evaluated.
+
+\paragraph{Limitations} The study uses one dataset and one network architecture, so its conclusions are limited to this task; the budget is fixed at 6,795 evaluations (about 0.2 evaluations per dimension on the CNN head) within a $[-1,1]$ search box; competitor parameters are standard defaults rather than individually tuned; all comparisons use one fixed test set, whose sampling uncertainty is reported but not reduced; APH and the memetic variants were designed after the benchmark results were known and have not been confirmed on fresh seeds; SHADE parameter adaptation and population-size reduction were not ablated; patient overlap between the official training and test folders cannot be fully excluded; the step-size parameter $\gamma=1$ and the search box of the frozen-feature benchmark were inherited from the original implementation and not varied; the head-training experiments on fine-tuned features use the features of one seed per fold; the cross-validation relies on patient identifiers parsed from file names; and the SDA operators could not be traced to a verifiable primary source, so we evaluate them as implemented.
+
+%% ===========================================================================
+\section{Conclusions}\label{sec:conclusion}
+On this task and under a controlled protocol, the sequential FPA--SDA hybrid was a worse optimiser than its SDA component, was below GA, PSO and L-SHADE on every endpoint, and was below gradient-trained classifiers on frozen CNN features; on the original 138,530-dimensional pipeline with standardised inputs none of the gradient-free optimisers tested exceeded chance level. A redesigned hybrid with adaptive operator selection and success-history adaptation approached L-SHADE, but owed this to a differential-evolution operator, and adding the plant-inspired operators to L-SHADE slightly worsened optimisation. Fine-tuning the network raised accuracy to \FTOffAcc\% on the official test folder and \FTCvAcc\% under patient-grouped cross-validation, and on fine-tuned features all optimisers, including the original hybrid, were within about one percentage point. Whether these findings extend to other datasets, budgets and published variants of FPA remains to be tested; we recommend that hybrids of this kind be reported with equal-budget baselines, component ablations and the training objective as an endpoint.
+
+\section*{Data and code availability}
+The dataset is publicly available \citep{kaggle2018cxr,kermany2018}; the data used are the Kaggle redistribution of the dataset released by \citet{kermany2018}. Code, configurations, per-run outputs (including test-set probabilities) and the script that generates every table and figure are available at \url{https://github.com/Mona-Sbakhi/fpa-sda-benchmark} and archived at Zenodo (\url{https://doi.org/10.5281/zenodo.24129035}).
+
+\section*{Ethics statement}
+This study used a public, de-identified dataset; no ethical approval or informed consent was required.
+
+\section*{Acknowledgments}
+During the preparation of this work the authors used Claude (Anthropic) to re-implement the optimisation pipeline, run and analyse the experiments, check references and draft and revise the text of the manuscript. The authors reviewed and edited the content as needed and take full responsibility for the content of the published article.
+
+\section*{Author contributions}
+\textbf{Mona Alsbakhi:} Conceptualization, Methodology, Software, Investigation, Writing -- original draft. \textbf{Mohammed Lubbad:} Methodology, Validation, Writing -- review \& editing. \textbf{Mohammed Alhanjouri:} Supervision, Writing -- review \& editing.
+
+\section*{Supporting information}
+\paragraph*{S1 Table.}\label{app:params} \textbf{Parameter settings of all methods.}
+\begin{table}[H]
+\centering
+\caption{Parameter settings. Common to all gradient-free methods: population/batch $n=45$, $T=150$ iterations (budget $6{,}795$ evaluations), box $[-1,1]^D$, uniform initialisation, one shared seed per run. ``Sel.'': replacement rule ($<$ strictly better; $\le$ not worse).}
+\label{tab:params}
+\footnotesize
+\begin{tabular}{p{2.6cm}p{8.6cm}c}
+\toprule
+Method & Parameters & Sel. \\
+\midrule
+FPA & $p=0.8$, $\gamma=1$, Lévy $\beta=1.5$ (Mantegna) & $<$ \\
+SDA & $(P_{\mathrm{wind}},P_{\mathrm{animal}},P_{\mathrm{gravity}})=(0.70,0.15,0.15)$, gravity step $U(-0.1,0.1)$, $\beta=1.5$ & $<$ \\
+Hybrid FPA--SDA & FPA then SDA, $\tau=75$; transfer or re-initialisation ($\sigma_{\mathrm{init}}=0.1$) & $<$ \\
+Random search & uniform resampling, per-slot replacement & $<$ \\
+PSO & $w=0.7298$, $c_1=c_2=1.49618$, $v_{\max}=0.2(ub-lb)$ & $<$ \\
+GA & steady state, binary tournament, BLX-$\alpha$ ($\alpha=0.5$), Gaussian mutation (rate $10/D$, $\sigma=0.2$), replaces worst & $<$ \\
+DE/rand/1/bin & $F=0.5$, $CR=0.9$ & $\le$ \\
+L-SHADE & current-to-$p$best/1/bin, $p=0.11$, memory $H=6$, archive size = population, population $45\to4$ & $\le$ \\
+APH & as L-SHADE; four operators (O1--O4), probability matching (rate $0.3$, floor $0.05$), Lévy clipped to $\pm3$ & $\le$ \\
+OpenAI-ES & 22 antithetic pairs per iteration, $\sigma=0.02$, Adam step $0.01$, centred ranks; starts from best of 45 uniform samples & -- \\
+ZO-SGD & two-point SPSA, $\epsilon=10^{-3}$, step $10^{-3}$; starts from best of 45 uniform samples & -- \\
+Memetic variants & inner optimiser for 75 iterations (hybrid with $\tau=37$, or APH), then 300 full-batch Adam steps, learning rate $10^{-3}$ & -- \\
+MLP, backprop & scikit-learn \texttt{MLPClassifier}, same hidden layers, Adam ($10^{-3}$) or SGD ($10^{-3}$, momentum $0.9$), $L_2=10^{-3}$, batch 64, $\le150$ epochs, early stopping on a random 10\% split (patience 15), no class weights & -- \\
+Logistic regression & $C=1$, balanced class weights & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\nolinenumbers
+\bibliographystyle{unsrtnat}
+\bibliography{../refs}
+
+\end{document}

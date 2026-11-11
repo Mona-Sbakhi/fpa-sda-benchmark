@@ -16,3 +16,10 @@ paper/*.log
 paper/*.out
 paper/*.spl
 paper/build.log
+paper/plos/*.aux
+paper/plos/*.bbl
+paper/plos/*.blg
+paper/plos/*.fdb_latexmk
+paper/plos/*.fls
+paper/plos/*.log
+paper/plos/*.out
