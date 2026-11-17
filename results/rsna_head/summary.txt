@@ -1,0 +1,83 @@
+rsna_head: 20 paired runs, 17 methods
+method                    acc         sens         spec           MCC           AUC  valMCC  fit_med
+MLP-Adam           89.11±0.38   85.19±0.72   91.78±0.80  0.773±0.008  0.950±0.003   0.773        -
+MLP-SGD            89.02±0.30   85.25±0.53   91.58±0.45  0.771±0.006  0.950±0.002   0.778        -
+LogReg             84.59±0.00   82.46±0.00   86.05±0.00  0.682±0.000  0.911±0.000   0.679        -
+L-SHADE            84.45±0.80   82.33±1.32   85.89±1.43  0.679±0.016  0.909±0.007   0.678    0.356
+APH                83.92±0.71   82.52±1.54   84.86±1.72  0.670±0.013  0.904±0.006   0.666    0.375
+GA                 81.50±1.09   81.43±2.13   81.55±2.20  0.623±0.020  0.886±0.008   0.620    0.602
+PSO                78.69±2.65   76.97±3.62   79.86±3.66  0.564±0.053  0.852±0.028   0.560    0.477
+OpenAI-ES          71.33±2.17   72.35±5.23   70.64±4.13  0.424±0.044  0.783±0.027   0.430    0.581
+ZO-SGD             71.08±2.30   70.73±5.95   71.31±4.67  0.416±0.047  0.777±0.030   0.417    0.563
+SDA                69.92±2.67   70.35±4.53   69.62±4.22  0.394±0.052  0.761±0.031   0.400    0.622
+DE                 67.58±3.97   69.08±6.61   66.57±8.25  0.354±0.069  0.741±0.043   0.354    1.101
+Hybrid-reinit      67.72±4.33   67.89±7.19   67.60±5.78  0.351±0.088  0.736±0.055   0.356    1.976
+Hybrid             65.53±3.79   65.07±6.15   65.84±6.23  0.306±0.072  0.707±0.046   0.314    0.862
+sep-CMA-ES         64.13±8.29  59.40±13.37  67.34±16.09  0.272±0.151  0.682±0.087   0.268    0.802
+Random             59.42±4.45   64.44±8.48   56.01±9.18  0.204±0.081  0.643±0.055   0.201    7.449
+FPA                58.52±7.25  62.75±10.60  55.65±16.46  0.182±0.119  0.630±0.077   0.185    5.729
+Majority           59.54±0.00    0.00±0.00  100.00±0.00  0.000±0.000  0.500±0.000   0.000        -
+
+Friedman over 13 gradient-free optimisers (test MCC): chi2=207.1, p=1.1e-37
+  mean rank  1.40  L-SHADE
+  mean rank  1.60  APH
+  mean rank  3.15  GA
+  mean rank  3.90  PSO
+  mean rank  6.25  OpenAI-ES
+  mean rank  6.70  ZO-SGD
+  mean rank  7.20  SDA
+  mean rank  8.40  DE
+  mean rank  8.45  Hybrid-reinit
+  mean rank  9.95  Hybrid
+  mean rank 10.10  sep-CMA-ES
+  mean rank 11.80  FPA
+  mean rank 12.10  Random
+
+Against the hybrid (Holm-adjusted within each endpoint; wins = runs better than the hybrid)
+  [fit]
+    DE               wins  4/20  p_Holm=0.0073
+    APH              wins 20/20  p_Holm=2.3e-05
+    GA               wins 17/20  p_Holm=0.00097
+    SDA              wins 20/20  p_Holm=2.3e-05
+    OpenAI-ES        wins 20/20  p_Holm=2.3e-05
+    Hybrid-reinit    wins  0/20  p_Holm=2.3e-05
+    FPA              wins  0/20  p_Holm=2.3e-05
+    L-SHADE          wins 20/20  p_Holm=2.3e-05
+    ZO-SGD           wins 20/20  p_Holm=2.3e-05
+    Random           wins  0/20  p_Holm=2.3e-05
+    PSO              wins 20/20  p_Holm=2.3e-05
+    sep-CMA-ES       wins 12/20  p_Holm=0.65
+  [val]
+    LogReg           wins 20/20  p_Holm=3.1e-05
+    DE               wins 14/20  p_Holm=0.14
+    MLP-Adam         wins 20/20  p_Holm=3.1e-05
+    APH              wins 20/20  p_Holm=3.1e-05
+    GA               wins 20/20  p_Holm=3.1e-05
+    SDA              wins 17/20  p_Holm=0.0034
+    OpenAI-ES        wins 18/20  p_Holm=0.00013
+    Hybrid-reinit    wins 15/20  p_Holm=0.072
+    FPA              wins  2/20  p_Holm=7.6e-05
+    L-SHADE          wins 20/20  p_Holm=3.1e-05
+    ZO-SGD           wins 19/20  p_Holm=0.00038
+    Random           wins  4/20  p_Holm=0.0013
+    PSO              wins 20/20  p_Holm=3.1e-05
+    Majority         wins  0/20  p_Holm=3.1e-05
+    MLP-SGD          wins 20/20  p_Holm=3.1e-05
+    sep-CMA-ES       wins  9/20  p_Holm=0.52
+  [test]
+    LogReg           wins 20/20  p_Holm=3.1e-05
+    DE               wins 16/20  p_Holm=0.15
+    MLP-Adam         wins 20/20  p_Holm=3.1e-05
+    APH              wins 20/20  p_Holm=3.1e-05
+    GA               wins 20/20  p_Holm=3.1e-05
+    SDA              wins 17/20  p_Holm=0.0016
+    OpenAI-ES        wins 18/20  p_Holm=7.6e-05
+    Hybrid-reinit    wins 15/20  p_Holm=0.15
+    FPA              wins  1/20  p_Holm=7.6e-05
+    L-SHADE          wins 20/20  p_Holm=3.1e-05
+    ZO-SGD           wins 19/20  p_Holm=0.00011
+    Random           wins  3/20  p_Holm=0.0016
+    PSO              wins 20/20  p_Holm=3.1e-05
+    Majority         wins  0/20  p_Holm=3.1e-05
+    MLP-SGD          wins 20/20  p_Holm=3.1e-05
+    sep-CMA-ES       wins 10/20  p_Holm=0.67

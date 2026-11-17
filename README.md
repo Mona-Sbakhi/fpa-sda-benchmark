@@ -35,6 +35,8 @@ hybrid_fpa_sda.ipynb   the original implementation that the study re-examines
 | `cnn_redesign`, `cnn_redesign_ablation` (`cnn_redesign_pilot`: first five seeds) | APH, L-SHADE, memetic variants, ablation | 50 / 20 |
 | `results/finetune_resnet50`, `results/finetune_cv` | fine-tuning: official split (5 seeds), 5-fold cross-validation (3 seeds) | – |
 | `cv_head_fold0..4` | head training on fine-tuned features inside the cross-validation | 10 per fold |
+| `cnn_cma` (`cnn_cma_pilot`: step-size pilot, seeds 900–904) | sep-CMA-ES on the main CNN-feature task, same seeds as `cnn_head` | 50 |
+| `rsna_head` | external replication on the RSNA Pneumonia dataset (14,863 adult radiographs), all methods | 20 |
 
 ## Reproduce
 ```bash
@@ -50,6 +52,16 @@ venv/bin/python scripts/extract_cnn_features.py --root <chest_xray> --out cache/
 venv/bin/python scripts/run_experiments.py configs/smoke.json --workers 4      # quick end-to-end check
 venv/bin/python scripts/run_experiments.py configs/cnn_head.json --workers 4
 ```
+RSNA replication: accept the rules of the Kaggle competition `rsna-pneumonia-detection-challenge`, download its
+archive, then
+```bash
+venv/bin/python scripts/rsna_features.py --zip <rsna archive>.zip --out cache/rsna_resnet50_224.npz
+venv/bin/python scripts/run_experiments.py configs/rsna_head.json --workers 4
+venv/bin/python scripts/rsna_summary.py rsna_head   # summary and paired tests
+venv/bin/python scripts/rsna_table.py               # paper/tables/rsna.tex
+```
+The study-design figure (`paper/figures/workflow.pdf`) is drawn by `scripts/workflow_figure.py`.
+
 Runs are deterministic given the seed stored in each JSON. The `cv_head_fold*` experiments need the features of the
 fine-tuned models, produced by `scripts/finetune_cnn.py --cv results/finetune_cv/cv_folds.npz --fold k --features float16`.
 

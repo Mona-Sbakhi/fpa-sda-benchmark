@@ -1,0 +1,17 @@
+{
+  "n_opt": 9512,
+  "n_val": 2378,
+  "n_test": 2973,
+  "opt_class_counts": [
+    5664,
+    3848
+  ],
+  "val_class_counts": [
+    1417,
+    961
+  ],
+  "test_class_counts": [
+    1770,
+    1203
+  ]
+}

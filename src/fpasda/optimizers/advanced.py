@@ -229,3 +229,49 @@ class ZOSGD(Optimizer):
         while B.left > 0:
             B(theta)
         return Result(B.best_x, B.best_f, B.history, getattr(f, "n_evals", -1))
+
+
+class SepCMAES(Optimizer):
+    """Separable CMA-ES (diagonal covariance; Ros & Hansen 2008), the CMA-type method that scales
+    linearly with the dimension. The first pop_size evaluations are the benchmark's uniform initial
+    population, and the search starts from its best member, as for OpenAI-ES and ZO-SGD.
+    Candidates are clipped to the box before evaluation; the update uses the unclipped samples."""
+    name = "sep-CMA-ES"
+
+    def run(self, f, dim, rng) -> Result:
+        n = dim
+        lam = int(self.params.get("lam", self.pop_size))
+        sigma = float(self.params.get("sigma0", 0.3))
+        B = _Budget(f, self.pop_size * (self.iterations + 1), self.pop_size)
+        init = [rng.uniform(self.lb, self.ub, n) for _ in range(self.pop_size)]
+        fi = [B(x) for x in init]
+        m = init[int(np.argmin(fi))].copy()
+        mu = lam // 2
+        w = np.log(mu + 0.5) - np.log(np.arange(1, mu + 1)); w /= w.sum()
+        mueff = 1.0 / (w ** 2).sum()
+        cs = (mueff + 2) / (n + mueff + 5)
+        ds = 1 + 2 * max(0.0, np.sqrt((mueff - 1) / (n + 1)) - 1) + cs
+        cc = 4.0 / (n + 4)
+        c1 = 2.0 / ((n + 1.3) ** 2 + mueff) * (n + 2) / 3          # separable scaling
+        cmu = min(1 - c1, 2 * (mueff - 2 + 1 / mueff) / ((n + 2) ** 2 + mueff) * (n + 2) / 3)
+        chi = np.sqrt(n) * (1 - 1 / (4 * n) + 1 / (21 * n * n))
+        C = np.ones(n); ps = np.zeros(n); pc = np.zeros(n); g = 0
+        while B.left >= lam:
+            Z = rng.standard_normal((lam, n))
+            Y = Z * np.sqrt(C)
+            X = m + sigma * Y
+            fx = np.array([B(self.clip(x)) for x in X])
+            idx = np.argsort(fx)[:mu]
+            yw = (w[:, None] * Y[idx]).sum(0)
+            zw = (w[:, None] * Z[idx]).sum(0)
+            m = m + sigma * yw
+            ps = (1 - cs) * ps + np.sqrt(cs * (2 - cs) * mueff) * zw
+            g += 1
+            hs = np.linalg.norm(ps) / np.sqrt(1 - (1 - cs) ** (2 * g)) < (1.4 + 2 / (n + 1)) * chi
+            pc = (1 - cc) * pc + hs * np.sqrt(cc * (2 - cc) * mueff) * yw
+            C = (1 - c1 - cmu) * C + c1 * (pc ** 2 + (1 - hs) * cc * (2 - cc) * C) \
+                + cmu * (w[:, None] * Y[idx] ** 2).sum(0)
+            sigma *= np.exp((cs / ds) * (np.linalg.norm(ps) / chi - 1))
+        while B.left > 0:
+            B(self.clip(m))
+        return Result(B.best_x, B.best_f, B.history, getattr(f, "n_evals", -1))

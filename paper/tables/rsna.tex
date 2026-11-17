@@ -1,0 +1,32 @@
+\begin{table}[!t]
+\centering
+\caption{External replication on the RSNA Pneumonia dataset (adult radiographs, normal vs lung opacity; 2048--16--2 head on frozen ResNet-50 features, $D=32{,}818$); mean$\pm$SD over 20 paired runs on the held-out test set (2,973 images). Rank: mean Friedman rank of test MCC among the 13 gradient-free optimisers (1 = best); Friedman $\chi^2_F=207.1$, $p=1.1\times 10^{-37}$.}
+\label{tab:rsna}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lcccccc}
+\toprule
+Method & Acc. (\%) & Sens. (\%) & Spec. (\%) & MCC & AUC & Rank \\
+\midrule
+\multicolumn{7}{l}{\textit{Gradient-free optimisers (6,795 fitness evaluations each)}} \\
+L-SHADE & 84.4$\pm$0.8 & 82.3$\pm$1.3 & 85.9$\pm$1.4 & 0.679$\pm$0.016 & 0.909$\pm$0.007 & 1.40 \\
+APH (redesigned hybrid) & 83.9$\pm$0.7 & 82.5$\pm$1.5 & 84.9$\pm$1.7 & 0.670$\pm$0.013 & 0.904$\pm$0.006 & 1.60 \\
+GA & 81.5$\pm$1.1 & 81.4$\pm$2.1 & 81.6$\pm$2.2 & 0.623$\pm$0.020 & 0.886$\pm$0.008 & 3.15 \\
+PSO & 78.7$\pm$2.6 & 77.0$\pm$3.6 & 79.9$\pm$3.7 & 0.564$\pm$0.053 & 0.852$\pm$0.028 & 3.90 \\
+OpenAI-ES & 71.3$\pm$2.2 & 72.4$\pm$5.2 & 70.6$\pm$4.1 & 0.424$\pm$0.044 & 0.783$\pm$0.027 & 6.25 \\
+ZO-SGD & 71.1$\pm$2.3 & 70.7$\pm$6.0 & 71.3$\pm$4.7 & 0.416$\pm$0.047 & 0.777$\pm$0.030 & 6.70 \\
+SDA & 69.9$\pm$2.7 & 70.3$\pm$4.5 & 69.6$\pm$4.2 & 0.394$\pm$0.052 & 0.761$\pm$0.031 & 7.20 \\
+DE & 67.6$\pm$4.0 & 69.1$\pm$6.6 & 66.6$\pm$8.3 & 0.354$\pm$0.069 & 0.741$\pm$0.043 & 8.40 \\
+Hybrid FPA--SDA (re-init) & 67.7$\pm$4.3 & 67.9$\pm$7.2 & 67.6$\pm$5.8 & 0.351$\pm$0.088 & 0.736$\pm$0.055 & 8.45 \\
+Hybrid FPA--SDA (transfer) & 65.5$\pm$3.8 & 65.1$\pm$6.2 & 65.8$\pm$6.2 & 0.306$\pm$0.072 & 0.707$\pm$0.046 & 9.95 \\
+sep-CMA-ES & 64.1$\pm$8.3 & 59.4$\pm$13.4 & 67.3$\pm$16.1 & 0.272$\pm$0.151 & 0.682$\pm$0.087 & 10.10 \\
+FPA & 58.5$\pm$7.3 & 62.7$\pm$10.6 & 55.6$\pm$16.5 & 0.182$\pm$0.119 & 0.630$\pm$0.077 & 11.80 \\
+Random search & 59.4$\pm$4.5 & 64.4$\pm$8.5 & 56.0$\pm$9.2 & 0.204$\pm$0.081 & 0.643$\pm$0.055 & 12.10 \\
+\multicolumn{7}{l}{\textit{Reference classifiers trained by gradient methods}} \\
+Logistic regression & 84.6$\pm$0.0 & 82.5$\pm$0.0 & 86.0$\pm$0.0 & 0.682$\pm$0.000 & 0.911$\pm$0.000 & -- \\
+MLP, backprop (Adam) & 89.1$\pm$0.4 & 85.2$\pm$0.7 & 91.8$\pm$0.8 & 0.773$\pm$0.008 & 0.950$\pm$0.003 & -- \\
+MLP, backprop (SGD) & 89.0$\pm$0.3 & 85.3$\pm$0.5 & 91.6$\pm$0.5 & 0.771$\pm$0.006 & 0.950$\pm$0.002 & -- \\
+Majority class & 59.5$\pm$0.0 & 0.0$\pm$0.0 & 100.0$\pm$0.0 & 0.000$\pm$0.000 & 0.500$\pm$0.000 & -- \\
+\bottomrule
+\end{tabular}
+\end{table}

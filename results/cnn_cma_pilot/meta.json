@@ -1,0 +1,61 @@
+{
+  "package_version": "0.2.0",
+  "python": "3.13.18",
+  "numpy": "2.5.3",
+  "scipy": "1.18.1",
+  "sklearn": "1.9.1",
+  "platform": "Linux-6.18.44-fc-v470-x86_64-with-glibc2.39",
+  "processor": "x86_64",
+  "cpu_count": 4,
+  "started": "2026-11-14 13:14:56",
+  "config": {
+    "name": "cnn_cma_pilot",
+    "description": "Pilot for sep-CMA-ES step size on seeds not used elsewhere (seed0=900); selection by validation MCC.",
+    "data": {
+      "root": "/home/user/data/chest_xray",
+      "size": 150,
+      "cache_dir": "cache"
+    },
+    "features": {
+      "type": "cnn",
+      "path": "cache/resnet50_224.npz",
+      "standardize": true
+    },
+    "split": {
+      "val_fraction": 0.2,
+      "seed": 42
+    },
+    "model": {
+      "hidden": [
+        16
+      ],
+      "l2_lambda": 0.001,
+      "class_weighted": true
+    },
+    "budget": {
+      "pop_size": 45,
+      "iterations": 150
+    },
+    "bounds": [
+      -1.0,
+      1.0
+    ],
+    "runs": 5,
+    "seed0": 900,
+    "output_dir": "results",
+    "algorithms": {
+      "sepCMA-s0.1": {
+        "type": "sep_cmaes",
+        "sigma0": 0.1
+      },
+      "sepCMA-s0.3": {
+        "type": "sep_cmaes",
+        "sigma0": 0.3
+      },
+      "sepCMA-s0.6": {
+        "type": "sep_cmaes",
+        "sigma0": 0.6
+      }
+    }
+  }
+}
