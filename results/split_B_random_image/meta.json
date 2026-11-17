@@ -1,0 +1,85 @@
+{
+  "package_version": "0.2.0",
+  "python": "3.13.18",
+  "numpy": "2.5.3",
+  "scipy": "1.18.1",
+  "sklearn": "1.9.1",
+  "platform": "Linux-6.18.44-fc-v553-x86_64-with-glibc2.39",
+  "processor": "x86_64",
+  "cpu_count": 4,
+  "started": "2026-11-17 10:56:51",
+  "config": {
+    "name": "split_B_random_image",
+    "description": "Split study, protocol B: pooled Kermany images (official train+test) re-split random image-wise (80/20, then 80/20 optimisation/validation); frozen ResNet-50 features; same head, budget and settings as cnn_head; 20 runs, seeds as cnn_head runs 0-19.",
+    "data": {
+      "root": "/home/user/data/chest_xray",
+      "size": 150,
+      "cache_dir": "cache"
+    },
+    "features": {
+      "type": "cnn",
+      "path": "cache/resnet50_224.npz",
+      "standardize": true
+    },
+    "split": {
+      "mode": "random_image",
+      "test_fraction": 0.2,
+      "val_fraction": 0.2,
+      "seed": 42
+    },
+    "model": {
+      "hidden": [
+        16
+      ],
+      "l2_lambda": 0.001,
+      "class_weighted": true
+    },
+    "budget": {
+      "pop_size": 45,
+      "iterations": 150
+    },
+    "bounds": [
+      -1.0,
+      1.0
+    ],
+    "runs": 20,
+    "seed0": 0,
+    "output_dir": "results",
+    "algorithms": {
+      "Hybrid": {
+        "type": "hybrid",
+        "transition": 75,
+        "mode": "transfer"
+      },
+      "SDA": {
+        "type": "sda",
+        "dispersal_probs": [
+          0.7,
+          0.15,
+          0.15
+        ]
+      },
+      "GA": {
+        "type": "ga"
+      },
+      "L-SHADE": {
+        "type": "lshade"
+      }
+    },
+    "baselines": {
+      "LogReg": {
+        "type": "logreg",
+        "C": 1.0
+      },
+      "MLP-Adam": {
+        "type": "mlp_backprop",
+        "solver": "adam",
+        "lr": 0.001,
+        "epochs": 150,
+        "hidden": [
+          16
+        ]
+      }
+    }
+  }
+}

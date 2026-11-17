@@ -37,6 +37,9 @@ hybrid_fpa_sda.ipynb   the original implementation that the study re-examines
 | `cv_head_fold0..4` | head training on fine-tuned features inside the cross-validation | 10 per fold |
 | `cnn_cma` (`cnn_cma_pilot`: step-size pilot, seeds 900–904) | sep-CMA-ES on the main CNN-feature task, same seeds as `cnn_head` | 50 |
 | `rsna_head` | external replication on the RSNA Pneumonia dataset (14,863 adult radiographs), all methods | 20 |
+| `split_B_random_image`, `split_C_random_patient` | evaluation protocol: pooled Kermany images re-split at image level (B) or by patient (C) | 20 |
+| `cross_K2R`, `cross_R2K` | cross-dataset generalisation: Kermany → RSNA and RSNA → Kermany | 20 |
+| `cnn_budget5x` | five times the evaluation budget (33,795 evaluations) on the main task | 20 |
 
 ## Reproduce
 ```bash
@@ -60,6 +63,8 @@ venv/bin/python scripts/run_experiments.py configs/rsna_head.json --workers 4
 venv/bin/python scripts/rsna_summary.py rsna_head   # summary and paired tests
 venv/bin/python scripts/rsna_table.py               # paper/tables/rsna.tex
 ```
+Protocol, cross-dataset and budget studies: `scripts/split_summary.py`, `scripts/cross_summary.py`, and
+`scripts/extra_tables.py` (writes `paper/tables/split.tex`, `cross.tex`, `budget.tex`).
 The study-design figure (`paper/figures/workflow.pdf`) is drawn by `scripts/workflow_figure.py`.
 
 Runs are deterministic given the seed stored in each JSON. The `cv_head_fold*` experiments need the features of the

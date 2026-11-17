@@ -1,0 +1,72 @@
+{
+  "package_version": "0.2.0",
+  "python": "3.13.18",
+  "numpy": "2.5.3",
+  "scipy": "1.18.1",
+  "sklearn": "1.9.1",
+  "platform": "Linux-6.18.44-fc-v553-x86_64-with-glibc2.39",
+  "processor": "x86_64",
+  "cpu_count": 4,
+  "started": "2026-11-17 12:41:01",
+  "config": {
+    "name": "cnn_budget5x",
+    "description": "Budget sensitivity: five times the evaluation budget (45 x 750 iterations = 33,795 evaluations) on the main CNN-feature task; hybrid transition scaled to 375; 20 runs with the seeds of cnn_head runs 0-19.",
+    "data": {
+      "root": "/home/user/data/chest_xray",
+      "size": 150,
+      "cache_dir": "cache"
+    },
+    "features": {
+      "type": "cnn",
+      "path": "cache/resnet50_224.npz",
+      "standardize": true
+    },
+    "split": {
+      "val_fraction": 0.2,
+      "seed": 42
+    },
+    "model": {
+      "hidden": [
+        16
+      ],
+      "l2_lambda": 0.001,
+      "class_weighted": true
+    },
+    "budget": {
+      "pop_size": 45,
+      "iterations": 750
+    },
+    "bounds": [
+      -1.0,
+      1.0
+    ],
+    "runs": 20,
+    "seed0": 0,
+    "output_dir": "results",
+    "algorithms": {
+      "Hybrid": {
+        "type": "hybrid",
+        "transition": 375,
+        "mode": "transfer"
+      },
+      "SDA": {
+        "type": "sda",
+        "dispersal_probs": [
+          0.7,
+          0.15,
+          0.15
+        ]
+      },
+      "GA": {
+        "type": "ga"
+      },
+      "L-SHADE": {
+        "type": "lshade"
+      },
+      "sep-CMA-ES": {
+        "type": "sep_cmaes",
+        "sigma0": 0.3
+      }
+    }
+  }
+}

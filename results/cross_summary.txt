@@ -1,0 +1,18 @@
+tested on RSNA: trained on RSNA vs trained on Kermany
+  method      acc in   acc x  MCC in   MCC x  AUC in   AUC x  sens x  spec x   p(MCC)
+  LogReg       84.59   67.78   0.682   0.411   0.911   0.789    84.7    56.3  7.7e-06
+  MLP-Adam     89.11   63.64   0.773   0.372   0.950   0.794    88.8    46.5  1.9e-06
+  L-SHADE      84.45   54.36   0.679   0.235   0.909   0.714    89.5    30.5  1.9e-06
+  GA           81.50   55.32   0.623   0.232   0.886   0.710    86.3    34.3  1.9e-06
+  SDA          69.92   51.71   0.394   0.117   0.761   0.601    75.0    35.9  1.9e-06
+  Hybrid       65.53   49.46   0.306   0.102   0.707   0.589    79.5    29.0  1.9e-06
+  cross-dataset ranking by MCC: LogReg > MLP-Adam > L-SHADE > GA > SDA > Hybrid
+tested on Kermany: trained on Kermany vs trained on RSNA
+  method      acc in   acc x  MCC in   MCC x  AUC in   AUC x  sens x  spec x   p(MCC)
+  LogReg       82.69   50.80   0.635   0.068   0.934   0.573    42.8    64.1  7.7e-06
+  MLP-Adam     81.56   56.90   0.614   0.215   0.939   0.667    45.8    75.4  1.9e-06
+  L-SHADE      80.96   60.42   0.587   0.224   0.900   0.666    57.8    64.7  1.9e-06
+  GA           80.01   58.69   0.565   0.182   0.890   0.627    57.5    60.7  1.9e-06
+  SDA          71.56   54.29   0.381   0.095   0.774   0.565    53.5    55.6  1.9e-06
+  Hybrid       70.03   54.83   0.345   0.131   0.746   0.596    50.2    62.6  2.7e-05
+  cross-dataset ranking by MCC: L-SHADE > MLP-Adam > GA > Hybrid > SDA > LogReg

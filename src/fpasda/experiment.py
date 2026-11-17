@@ -36,16 +36,49 @@ def prepare(cfg: dict, out_dir: Path) -> Path:
         X_tr, y_tr, X_te, y_te = d["F_train"], d["y_train"], d["F_test"], d["y_test"]
         files = list(d["train_files"])
 
-    groups = np.array([patient_id(f) for f in files])
+    mode = cfg["split"].get("mode", "official")
+    leak = {}
+    if mode != "official":
+        # Re-split the pooled data (official train + test folders) to study the effect of the split:
+        #   random_image   -- image-level stratified split, as in much of the literature (patients may be shared)
+        #   random_patient -- patient-grouped stratified split of the same pooled data
+        test_files = list(d["test_files"])
+        X_all = np.concatenate([X_tr, X_te]); y_all = np.concatenate([y_tr, y_te])
+        f_all = files + ["test::" + str(f) for f in test_files]
+        g_all = np.array([patient_id(str(f).split("::")[-1]) for f in f_all])
+        tf = cfg["split"].get("test_fraction", 0.2); sd = cfg["split"].get("seed", 42)
+        if mode == "random_image":
+            from sklearn.model_selection import train_test_split
+            tr_i, te_i = train_test_split(np.arange(len(y_all)), test_size=tf, stratify=y_all, random_state=sd)
+        elif mode == "random_patient":
+            sg = StratifiedGroupKFold(n_splits=int(round(1 / tf)), shuffle=True, random_state=sd)
+            tr_i, te_i = next(sg.split(X_all, y_all, g_all))
+        else:
+            raise ValueError(mode)
+        leak = {"split_mode": mode,
+                "test_images_with_patient_in_train": int(np.isin(g_all[te_i], g_all[tr_i]).sum())}
+        X_tr, y_tr, X_te, y_te = X_all[tr_i], y_all[tr_i], X_all[te_i], y_all[te_i]
+        files = [f_all[i] for i in tr_i]
+    ext = fc.get("external_test")
+    if ext:   # cross-dataset evaluation: replace the test set by the held-out test set of another dataset
+        e = load_precomputed(ext)
+        X_te, y_te = e["F_test"], e["y_test"]
+        leak["external_test"] = ext
+    groups = np.array([patient_id(str(f).split("::")[-1]) for f in files])
     k = int(round(1 / cfg["split"].get("val_fraction", 0.2)))
-    sgkf = StratifiedGroupKFold(n_splits=k, shuffle=True, random_state=cfg["split"].get("seed", 42))
-    opt_idx, val_idx = next(sgkf.split(X_tr, y_tr, groups))
-    assert not set(groups[opt_idx]) & set(groups[val_idx]), "patient leakage between opt/val"
+    if mode == "random_image":   # leaky practice: validation subset also drawn at image level
+        from sklearn.model_selection import StratifiedKFold
+        opt_idx, val_idx = next(StratifiedKFold(n_splits=k, shuffle=True,
+                                                random_state=cfg["split"].get("seed", 42)).split(X_tr, y_tr))
+    else:
+        sgkf = StratifiedGroupKFold(n_splits=k, shuffle=True, random_state=cfg["split"].get("seed", 42))
+        opt_idx, val_idx = next(sgkf.split(X_tr, y_tr, groups))
+        assert not set(groups[opt_idx]) & set(groups[val_idx]), "patient leakage between opt/val"
 
     info = {"n_opt": int(len(opt_idx)), "n_val": int(len(val_idx)), "n_test": int(len(y_te)),
             "opt_class_counts": np.bincount(y_tr[opt_idx]).tolist(),
             "val_class_counts": np.bincount(y_tr[val_idx]).tolist(),
-            "test_class_counts": np.bincount(y_te).tolist()}
+            "test_class_counts": np.bincount(y_te).tolist(), **leak}
     if fc["type"] == "pca":
         feat = PCAFeatures(fc.get("n_components", 1000), fc.get("standardize", True), cfg["split"].get("seed", 42))
         feat.fit(X_tr[opt_idx])

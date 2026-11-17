@@ -1,0 +1,19 @@
+\begin{table}[!t]
+\centering
+\caption{Budget sensitivity on the main Kermany task: 6,795 versus 33,795 fitness evaluations (45 $\times$ 750 iterations; hybrid transition at iteration 375), 20 runs with the same seeds. Fitness: median final training fitness; MCC: mean test MCC; $p$: Wilcoxon signed-rank test of the MCC change. Ranking by test MCC at 1$\times$: L-SHADE $>$ GA $>$ sep-CMA-ES $>$ SDA $>$ Hybrid FPA--SDA; at 5$\times$: sep-CMA-ES $>$ L-SHADE $>$ SDA $>$ GA $>$ Hybrid FPA--SDA.}
+\label{tab:budget}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lcccccc}
+\toprule
+ & \multicolumn{2}{c}{Training fitness} & \multicolumn{2}{c}{Test MCC} & & \\
+Method & 1$\times$ & 5$\times$ & 1$\times$ & 5$\times$ & $\Delta$MCC & $p$ \\
+\midrule
+L-SHADE & 0.165 & 0.019 & 0.587 & 0.597 & +0.011 & 0.31 \\
+GA & 0.224 & 0.011 & 0.565 & 0.575 & +0.011 & 0.29 \\
+sep-CMA-ES & 0.523 & 0.175 & 0.444 & 0.639 & +0.195 & $<$0.001 \\
+SDA & 0.440 & 0.171 & 0.381 & 0.596 & +0.215 & $<$0.001 \\
+Hybrid FPA--SDA & 0.746 & 0.296 & 0.345 & 0.513 & +0.168 & $<$0.001 \\
+\bottomrule
+\end{tabular}
+\end{table}

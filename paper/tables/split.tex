@@ -1,0 +1,20 @@
+\begin{table}[!t]
+\centering
+\caption{Effect of the evaluation protocol on Kermany (frozen ResNet-50 features, 2048--16--2 head; mean over 20 runs). A: official split (patient-grouped optimisation/validation subsets, official test folder of 624 images). C: all 5,856 images pooled and split 80/20 by patient (1,171 test images). B: the same pooled images split 80/20 at image level, as in much of the literature (1,172 test images, 714 of them from patients that also occur in training). $p$: Wilcoxon signed-rank test over runs with the same seed; --: deterministic method.}
+\label{tab:split}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{lcccccccccc}
+\toprule
+ & \multicolumn{3}{c}{Accuracy (\%)} & \multicolumn{3}{c}{MCC} & \multicolumn{2}{c}{C $-$ A (acc.)} & \multicolumn{2}{c}{B $-$ C (acc.)} \\
+Method & A & C & B & A & C & B & $\Delta$ & $p$ & $\Delta$ & $p$ \\
+\midrule
+Logistic regression & 82.7 & 94.5 & 95.2 & 0.635 & 0.862 & 0.879 & +11.8 & -- & +0.7 & -- \\
+MLP, backprop (Adam) & 81.6 & 95.1 & 94.9 & 0.614 & 0.874 & 0.872 & +13.5 & $<$0.001 & -0.1 & 0.57 \\
+L-SHADE & 81.0 & 89.2 & 89.3 & 0.587 & 0.747 & 0.749 & +8.3 & $<$0.001 & +0.1 & 0.91 \\
+GA & 80.0 & 88.1 & 87.3 & 0.565 & 0.720 & 0.703 & +8.1 & $<$0.001 & -0.7 & 0.02 \\
+SDA & 71.6 & 76.5 & 77.0 & 0.381 & 0.492 & 0.494 & +5.0 & $<$0.001 & +0.4 & 0.41 \\
+Hybrid FPA--SDA & 70.0 & 74.3 & 74.8 & 0.345 & 0.450 & 0.445 & +4.3 & $<$0.001 & +0.5 & 0.67 \\
+\bottomrule
+\end{tabular}
+\end{table}

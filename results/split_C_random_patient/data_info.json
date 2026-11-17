@@ -1,0 +1,19 @@
+{
+  "n_opt": 3748,
+  "n_val": 937,
+  "n_test": 1171,
+  "opt_class_counts": [
+    1014,
+    2734
+  ],
+  "val_class_counts": [
+    253,
+    684
+  ],
+  "test_class_counts": [
+    316,
+    855
+  ],
+  "split_mode": "random_patient",
+  "test_images_with_patient_in_train": 0
+}

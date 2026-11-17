@@ -1,0 +1,18 @@
+{
+  "n_opt": 9512,
+  "n_val": 2378,
+  "n_test": 624,
+  "opt_class_counts": [
+    5664,
+    3848
+  ],
+  "val_class_counts": [
+    1417,
+    961
+  ],
+  "test_class_counts": [
+    234,
+    390
+  ],
+  "external_test": "cache/resnet50_224.npz"
+}
