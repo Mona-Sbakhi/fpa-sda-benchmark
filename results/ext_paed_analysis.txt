@@ -1,0 +1,36 @@
+{
+  "n_images": 847,
+  "n_patients": 448,
+  "Delta_frozen": 0.12694010798783145,
+  "Delta_frozen_CI": [
+    0.10143514430878428,
+    0.15065563070535892
+  ],
+  "Delta_finetuned": 0.018565022272677967,
+  "Delta_finetuned_CI": [
+    0.011544460932398087,
+    0.026077848573231987
+  ],
+  "I": -0.10837508571515349,
+  "I_CI": [
+    -0.1321554603355921,
+    -0.08262737664297937
+  ],
+  "verdict": "inconclusive",
+  "internal_kermany_Delta": {
+    "frozen": 0.11373512144945024,
+    "finetuned": -0.00017135872550098964
+  }
+}
+  frozen/APH             MCC 0.233  AUC 0.687  sens 82.2  spec 38.9
+  frozen/APH-noO3        MCC 0.106  AUC 0.591  sens 74.6  spec 34.9
+  frozen/APH-O3only      MCC 0.274  AUC 0.708  sens 83.1  spec 42.3
+  frozen/L-SHADE         MCC 0.216  AUC 0.673  sens 82.4  spec 36.8
+  frozen/LogReg          MCC 0.292  AUC 0.709  sens 71.2  spec 58.0
+  frozen/MLP-Adam        MCC 0.307  AUC 0.702  sens 69.3  spec 61.5
+  finetuned/APH          MCC 0.540  AUC 0.867  sens 88.9  spec 63.7
+  finetuned/APH-noO3     MCC 0.521  AUC 0.864  sens 87.7  spec 62.6
+  finetuned/APH-O3only   MCC 0.547  AUC 0.873  sens 89.8  spec 63.3
+  finetuned/L-SHADE      MCC 0.544  AUC 0.872  sens 89.5  spec 63.3
+  finetuned/LogReg       MCC 0.563  AUC 0.889  sens 90.3  spec 64.9
+  finetuned/MLP-Adam     MCC 0.572  AUC 0.881  sens 87.9  spec 68.7

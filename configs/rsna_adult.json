@@ -1,0 +1,123 @@
+{
+  "name": "rsna_adult",
+  "description": "External replication on RSNA Pneumonia, corrected: adults only (18-100 years), images grouped by their NIH patient (official RSNA mapping) for both the test split and the optimisation/validation split; frozen ResNet-50 features, same head, budget, methods and settings as rsna_head; 20 paired runs.",
+  "data": {
+    "root": "/home/user/data/chest_xray",
+    "size": 150,
+    "cache_dir": "cache"
+  },
+  "features": {
+    "type": "cnn",
+    "path": "cache/rsna_adult_resnet50_224.npz",
+    "standardize": true
+  },
+  "split": {
+    "val_fraction": 0.2,
+    "seed": 42
+  },
+  "model": {
+    "hidden": [
+      16
+    ],
+    "l2_lambda": 0.001,
+    "class_weighted": true
+  },
+  "budget": {
+    "pop_size": 45,
+    "iterations": 150
+  },
+  "bounds": [
+    -1.0,
+    1.0
+  ],
+  "runs": 20,
+  "seed0": 0,
+  "output_dir": "results",
+  "algorithms": {
+    "Hybrid": {
+      "type": "hybrid",
+      "transition": 75,
+      "mode": "transfer"
+    },
+    "Hybrid-reinit": {
+      "type": "hybrid",
+      "transition": 75,
+      "mode": "reinit",
+      "reinit_sigma": 0.05
+    },
+    "FPA": {
+      "type": "fpa",
+      "switch_probability": 0.8
+    },
+    "SDA": {
+      "type": "sda",
+      "dispersal_probs": [
+        0.7,
+        0.15,
+        0.15
+      ]
+    },
+    "PSO": {
+      "type": "pso"
+    },
+    "DE": {
+      "type": "de",
+      "F": 0.5,
+      "CR": 0.9
+    },
+    "GA": {
+      "type": "ga"
+    },
+    "Random": {
+      "type": "random"
+    },
+    "APH": {
+      "type": "aph"
+    },
+    "L-SHADE": {
+      "type": "lshade"
+    },
+    "OpenAI-ES": {
+      "type": "openai_es",
+      "sigma": 0.02,
+      "lr": 0.01
+    },
+    "ZO-SGD": {
+      "type": "zo_sgd",
+      "lr": 0.001,
+      "eps": 0.001
+    },
+    "sep-CMA-ES": {
+      "type": "sep_cmaes",
+      "sigma0": 0.3
+    }
+  },
+  "baselines": {
+    "Majority": {
+      "type": "majority"
+    },
+    "LogReg": {
+      "type": "logreg",
+      "C": 1.0
+    },
+    "MLP-Adam": {
+      "type": "mlp_backprop",
+      "solver": "adam",
+      "lr": 0.001,
+      "epochs": 150,
+      "hidden": [
+        16
+      ]
+    },
+    "MLP-SGD": {
+      "type": "mlp_backprop",
+      "solver": "sgd",
+      "lr": 0.001,
+      "momentum": 0.9,
+      "epochs": 150,
+      "hidden": [
+        16
+      ]
+    }
+  }
+}

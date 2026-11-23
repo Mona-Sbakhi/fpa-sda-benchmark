@@ -1,0 +1,27 @@
+\begin{table}[!t]
+\centering
+\caption{Pre-registered external test on children (RSNA, NIH Clinical Center; 847 images of 448 patients aged 1--17 years, normal vs lung opacity). All models were trained on Kermany development data only and fixed before the test. Frozen: ImageNet ResNet-50 features, 20 runs; fine-tuned: ResNet-50 fine-tuned on the Kermany optimisation subset, 3 fine-tuning seeds $\times$ 20 runs. MCC (Kermany): official Kermany test folder. External columns: mean over runs. $\Delta$: MCC of APH minus APH without O3 on the external set; $I=\Delta_{\mathrm{fine\text{-}tuned}}-\Delta_{\mathrm{frozen}}$; 95\% intervals from a bootstrap over external patients (5,000 resamples). $\Delta_{\mathrm{frozen}}=+0.127$ [+0.101, +0.151], $\Delta_{\mathrm{fine\text{-}tuned}}=+0.019$ [+0.012, +0.026], $I=-0.108$ [-0.132, -0.083].}
+\label{tab:external}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{llccccc}
+\toprule
+ & & MCC & \multicolumn{4}{c}{External paediatric test} \\
+Representation & Method & (Kermany) & MCC & AUC & Sens. (\%) & Spec. (\%) \\
+\midrule
+Frozen & APH (O1--O4) & 0.594 & 0.233 & 0.687 & 82.2 & 38.9 \\
+ & APH without O3 & 0.481 & 0.106 & 0.591 & 74.6 & 34.9 \\
+ & O3 (current-to-$p$best) only & 0.611 & 0.274 & 0.708 & 83.1 & 42.3 \\
+ & L-SHADE & 0.596 & 0.216 & 0.673 & 82.4 & 36.8 \\
+ & Logistic regression & 0.635 & 0.292 & 0.709 & 71.2 & 58.0 \\
+ & MLP, backprop (Adam) & 0.614 & 0.307 & 0.702 & 69.3 & 61.5 \\
+\midrule
+Fine-tuned & APH (O1--O4) & 0.707 & 0.540 & 0.867 & 88.9 & 63.7 \\
+ & APH without O3 & 0.708 & 0.521 & 0.864 & 87.7 & 62.6 \\
+ & O3 (current-to-$p$best) only & 0.709 & 0.547 & 0.873 & 89.8 & 63.3 \\
+ & L-SHADE & 0.705 & 0.544 & 0.872 & 89.5 & 63.3 \\
+ & Logistic regression & 0.716 & 0.563 & 0.889 & 90.3 & 64.9 \\
+ & MLP, backprop (Adam) & 0.715 & 0.572 & 0.881 & 87.9 & 68.7 \\
+\bottomrule
+\end{tabular}
+\end{table}

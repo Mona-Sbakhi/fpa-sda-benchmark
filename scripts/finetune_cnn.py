@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Fine-tune ImageNet ResNet-50 on the Kermany chest X-rays (GPU). Detached-friendly: logs to a file.
+"""Fine-tune ImageNet ResNet-50 on the Kermany chest X-rays (GPU or CPU). Detached-friendly: logs to a file;
+resumes from checkpoint.pt after an interruption; KEEP_WEIGHTS=1 keeps best.pt (needed for external tests).
 
     python finetune_cnn.py --data cxr256.npz --out ft_out --seed 0 [--epochs 12]
 
@@ -83,7 +84,14 @@ def predict(X, idx, feats=False):
 
 log, best, t0 = [], (-2, -1), time.time()
 rng = np.random.default_rng(a.seed)
-for ep in range(a.epochs):
+CK = os.path.join(a.out, "checkpoint.pt"); start = 0
+if os.path.exists(CK):   # resume after an interruption: model, optimiser, schedule and random states
+    ck = torch.load(CK, weights_only=False)
+    net.load_state_dict(ck["net"]); optim.load_state_dict(ck["optim"]); sched.load_state_dict(ck["sched"])
+    scaler.load_state_dict(ck["scaler"]); torch.set_rng_state(ck["torch_rng"]); rng.bit_generator.state = ck["np_rng"]
+    log, best, start = ck["log"], tuple(ck["best"]), ck["epoch"]; t0 -= ck["elapsed"]
+    print(json.dumps({"resumed_after_epoch": start}), flush=True)
+for ep in range(start, a.epochs):
     net.train(); perm = rng.permutation(opt); tot = 0.0
     for s in range(0, len(perm), a.bs):
         idx = np.sort(perm[s:s + a.bs]); x = batch(Xtr, idx, True); y = torch.from_numpy(ytr[idx]).to(dev)
@@ -96,6 +104,10 @@ for ep in range(a.epochs):
     print(json.dumps(log[-1]), flush=True)
     if vm["mcc"] > best[0]:
         best = (vm["mcc"], ep + 1); torch.save(net.state_dict(), os.path.join(a.out, "best.pt"))
+    torch.save({"net": net.state_dict(), "optim": optim.state_dict(), "sched": sched.state_dict(),
+                "scaler": scaler.state_dict(), "torch_rng": torch.get_rng_state(), "np_rng": rng.bit_generator.state,
+                "log": log, "best": best, "epoch": ep + 1, "elapsed": time.time() - t0}, CK + ".tmp")
+    os.replace(CK + ".tmp", CK)
 net.load_state_dict(torch.load(os.path.join(a.out, "best.pt")))
 pte, Fte = predict(Xte, np.arange(len(yte)), True)
 ptr, Ftr = predict(Xtr, np.arange(len(ytr)), True)
@@ -108,6 +120,9 @@ if a.features != "none":
     np.savez(os.path.join(a.out, "features.npz"), F_train=Ftr.astype(a.features), y_train=ytr, F_test=Fte.astype(a.features),
              y_test=yte, opt_idx=opt, val_idx=val)
 res["fold"] = a.fold if a.cv else None; res["n_opt"], res["n_val"], res["n_test"] = len(opt), len(val), len(yte)
-os.remove(os.path.join(a.out, "best.pt"))
+if os.environ.get("KEEP_WEIGHTS") != "1":
+    os.remove(os.path.join(a.out, "best.pt"))
+if os.path.exists(CK):
+    os.remove(CK)
 json.dump(res, open(os.path.join(a.out, "metrics.json"), "w"))
 print("DONE", json.dumps({"val": res["val"], "test": res["test"], "selected_epoch": best[1]}), flush=True)

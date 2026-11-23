@@ -270,7 +270,7 @@ share = {k_: np.mean([cnn["APH"][i]["extra"]["operator_share"][k_] for i in ids5
 # ---------------------------------------------------------------- PCA experiments (10 runs)
 pr, po = load("pca_mlp_revised"), load("pca_mlp_original_setting")
 lines = [r"\begin{table}[!t]", r"\centering", r"\caption{Original pipeline: PCA(1000) pixel features and a 1000--128--64--32--2 network ($D=138{,}530$); mean over 10 runs. "
-         r"Raw PCA scores reproduce the original notebook; standardised scores are the variant in which every component has unit variance.}",
+         r"Raw PCA scores follow the reference implementation; standardised scores are the variant in which every component has unit variance.}",
          r"\label{tab:pca}", r"\footnotesize", r"\begin{tabular}{llccc}", r"\toprule",
          r"Features & Method & Acc. (\%) & MCC & AUC \\", r"\midrule"]
 for nm_, R, algos in [("Raw PCA", po, ["SDA", "Hybrid", "Random", "FPA"]),
@@ -310,7 +310,11 @@ for a_ in ["Hybrid", "APH", "LogReg"]:   # stored metrics are reproduced from th
     assert np.allclose(mcc_rows(PRED[a_], y_te), vals(cnn, a_, "mcc")), a_
 B_ = 2000
 rng_b = np.random.default_rng(12345)
-IDX = rng_b.integers(0, len(y_te), (B_, len(y_te)))
+# cluster bootstrap: resample test patients with replacement and keep all images of each sampled patient
+from fpasda.data import patient_id as _pid  # noqa: E402
+_g = np.array([_pid(str(f)) for f in LABELS["test_files"]])
+_groups = [np.flatnonzero(_g == u) for u in np.unique(_g)]
+IDX = [np.concatenate([_groups[k] for k in rng_b.integers(0, len(_groups), len(_groups))]) for _ in range(B_)]
 boot_mean = {}
 for a_ in set(sum([[x, y] for x, y in [("APH", "GA"), ("APH", "L-SHADE"), ("Hybrid", "SDA"), ("Hybrid", "FPA"), ("L-SHADE", "GA"),
                                          ("LogReg", "L-SHADE"), ("MLP-Adam", "APH"), ("Memetic-APH", "MLP-Adam")]], [])):
@@ -318,10 +322,10 @@ for a_ in set(sum([[x, y] for x, y in [("APH", "GA"), ("APH", "L-SHADE"), ("Hybr
 CONTRASTS = [("APH", "GA"), ("APH", "L-SHADE"), ("L-SHADE", "GA"), ("Hybrid", "SDA"), ("Hybrid", "FPA"),
              ("LogReg", "L-SHADE"), ("MLP-Adam", "APH"), ("Memetic-APH", "MLP-Adam")]
 lines = [r"\begin{table}[!t]", r"\centering",
-         r"\caption{Uncertainty due to the fixed 624-image test set. For each contrast, test images are resampled with replacement (2,000 bootstrap samples) and the difference in run-averaged MCC is recomputed from the stored predictions; seeds are held fixed. "
+         r"\caption{Uncertainty due to the fixed 624-image test set. For each contrast, the 431 test patients are resampled with replacement, keeping all images of each sampled patient (2,000 bootstrap samples), and the difference in run-averaged MCC is recomputed from the stored predictions; seeds are held fixed. "
          r"Intervals that include 0 indicate contrasts not resolved by this test set, even when they are significant across seeds (Table~\ref{tab:wilcoxon}).}",
          r"\label{tab:bootstrap}", r"\footnotesize", r"\begin{tabular}{llrc}", r"\toprule",
-         r"Method & vs & $\bar\Delta$ MCC & 95\% CI (test images) \\", r"\midrule"]
+         r"Method & vs & $\bar\Delta$ MCC & 95\% CI (test patients) \\", r"\midrule"]
 BOOT = {}
 for x, y in CONTRASTS:
     dd = boot_mean[x] - boot_mean[y]; obs = vals(cnn, x, "mcc").mean() - vals(cnn, y, "mcc").mean()
@@ -425,7 +429,7 @@ X["SdaFpaDelta"] = f"{d_.mean():+.3f}"; X["SdaFpaP"] = sci(stats.wilcoxon(vals(c
 # ---- ablation table rebuilt: mean differences and test-image bootstrap intervals
 PA = {a: np.array([np.array(ab[a][i]["test_proba"]) >= 0.5 for i in ids20]) for a in AB}
 bm = {a: np.array([mcc_rows(PA[a][:, ix], y_te[ix]).mean() for ix in IDX]) for a in AB}
-lines = [r"\begin{table}[!t]", r"\centering", r"\caption{Component ablation of APH and cross-field gradient-free baselines (20 paired runs). $\bar\Delta$: mean MCC of the variant minus APH; CI: 95\% test-image bootstrap interval of $\bar\Delta$; "
+lines = [r"\begin{table}[!t]", r"\centering", r"\caption{Component ablation of APH and cross-field gradient-free baselines (20 paired runs). $\bar\Delta$: mean MCC of the variant minus APH; CI: 95\% patient-level bootstrap interval of $\bar\Delta$ over the test set; "
          r"$p_{\mathrm{Holm}}$: Wilcoxon signed-rank test against APH across runs.}",
          r"\label{tab:ablation}", r"\footnotesize", r"\begin{tabular}{lccrcc}", r"\toprule",
          r"Variant & MCC & AUC & $\bar\Delta$ & CI & $p_{\mathrm{Holm}}$ \\", r"\midrule"]

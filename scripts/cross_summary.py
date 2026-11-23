@@ -23,8 +23,8 @@ def load(path):
 
 
 KK = load(f"{BASE}/cnn_head"); KK["L-SHADE"] = load(f"{BASE}/cnn_redesign")["L-SHADE"]
-RR = load(f"{BASE}/rsna_head")
-KR = load("results/cross_K2R"); RK = load("results/cross_R2K")
+RR = load("results/rsna_adult")
+KR = load("results/cross_K2R_adult"); RK = load("results/cross_R2K_adult")
 methods = ["LogReg", "MLP-Adam", "L-SHADE", "GA", "SDA", "Hybrid"]
 ids = list(range(20))
 

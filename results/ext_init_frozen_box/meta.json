@@ -1,0 +1,62 @@
+{
+  "package_version": "0.2.0",
+  "python": "3.13.18",
+  "numpy": "2.5.3",
+  "scipy": "1.18.1",
+  "sklearn": "1.9.1",
+  "platform": "Linux-6.18.44-fc-v726-x86_64-with-glibc2.39",
+  "processor": "x86_64",
+  "cpu_count": 4,
+  "started": "2026-11-22 22:14:28",
+  "config": {
+    "name": "ext_init_frozen_box",
+    "description": "Pre-registered initialisation sensitivity (frozen, box); development data only; judged on validation MCC.",
+    "data": {
+      "root": "/home/user/data/chest_xray",
+      "size": 150,
+      "cache_dir": "cache"
+    },
+    "features": {
+      "type": "cnn",
+      "path": "cache/resnet50_224.npz",
+      "standardize": true
+    },
+    "split": {
+      "val_fraction": 0.2,
+      "seed": 42
+    },
+    "model": {
+      "hidden": [
+        16
+      ],
+      "l2_lambda": 0.001,
+      "class_weighted": true
+    },
+    "budget": {
+      "pop_size": 45,
+      "iterations": 150
+    },
+    "bounds": [
+      -1.0,
+      1.0
+    ],
+    "runs": 10,
+    "seed0": 7,
+    "output_dir": "results",
+    "algorithms": {
+      "APH": {
+        "type": "aph"
+      },
+      "APH-noO3": {
+        "type": "aph",
+        "operators": [
+          "global",
+          "local",
+          "gravity"
+        ]
+      }
+    },
+    "baselines": {},
+    "save_weights": false
+  }
+}

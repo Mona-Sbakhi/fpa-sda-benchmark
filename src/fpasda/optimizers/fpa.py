@@ -1,4 +1,4 @@
-"""Flower Pollination Algorithm (Yang, UCNC 2012, LNCS 7445:240-249), as in the original notebook.
+"""Flower Pollination Algorithm (Yang, UCNC 2012, LNCS 7445:240-249), as in the reference implementation.
 
 Global pollination: x_i <- x_i + gamma * L * (g* - x_i)       with probability p
 Local pollination:  x_i <- x_i + eps * (x_j - x_k), eps~U(0,1)  otherwise

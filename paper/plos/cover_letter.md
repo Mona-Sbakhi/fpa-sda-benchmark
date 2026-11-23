@@ -6,9 +6,8 @@ We submit the manuscript "Do plant-inspired operators help to train a pneumonia 
 benchmark and component analysis of a hybrid Flower Pollination–Seed Dispersal algorithm" for consideration
 as a Research Article in PLOS ONE.
 
-The study re-examines, under a controlled and fully reproducible protocol, a hybrid of two nature-inspired
-optimisers that we had ourselves proposed in an unpublished draft for training a pneumonia classifier on chest
-radiographs. With equal evaluation budgets, 50 paired runs, patient-grouped validation and non-parametric
+The study examines, under a controlled and fully reproducible protocol, a sequential hybrid of two
+nature-inspired optimisers for training a pneumonia classifier on chest radiographs. With equal evaluation budgets, 50 paired runs, patient-grouped validation and non-parametric
 statistics on three endpoints, the hybrid does not outperform its own second component and is below established
 optimisers (GA, PSO, L-SHADE) and gradient-trained classifiers. A component ablation shows that a redesigned
 variant owes its improvement to a differential-evolution operator and not to the plant-inspired operators.

@@ -3,7 +3,7 @@
 Phase 1: FPA for `transition` iterations.  Phase 2: SDA for the remaining iterations.
 
 Transition modes:
-  "transfer" (original notebook): SDA continues from FPA's final population unchanged.
+  "transfer" (reference implementation): SDA continues from FPA's final population unchanged.
   "reinit"   (manuscript Sec. 4.4.3): the population is re-sampled around FPA's best solution,
              x = clip(g* + N(0, (sigma*(ub-lb))^2)); the best solution itself is kept. The
              re-sampled individuals are evaluated, so this mode costs pop_size-1 extra

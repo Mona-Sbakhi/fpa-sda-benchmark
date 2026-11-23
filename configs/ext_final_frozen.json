@@ -1,0 +1,90 @@
+{
+  "name": "ext_final_frozen",
+  "description": "Pre-registered final runs (ext_final_frozen); trained on Kermany development data only; initialisation 'glorot' chosen on validation MCC; head weights saved before the external paediatric test.",
+  "data": {
+    "root": "/home/user/data/chest_xray",
+    "size": 150,
+    "cache_dir": "cache"
+  },
+  "features": {
+    "type": "cnn",
+    "path": "cache/resnet50_224.npz",
+    "standardize": true
+  },
+  "split": {
+    "val_fraction": 0.2,
+    "seed": 42
+  },
+  "model": {
+    "hidden": [
+      16
+    ],
+    "l2_lambda": 0.001,
+    "class_weighted": true
+  },
+  "budget": {
+    "pop_size": 45,
+    "iterations": 150
+  },
+  "bounds": [
+    -1.0,
+    1.0
+  ],
+  "runs": 20,
+  "seed0": 0,
+  "output_dir": "results",
+  "algorithms": {
+    "APH": {
+      "type": "aph",
+      "param_scale": {
+        "type": "glorot",
+        "mult": 2.0
+      }
+    },
+    "APH-noO3": {
+      "type": "aph",
+      "operators": [
+        "global",
+        "local",
+        "gravity"
+      ],
+      "param_scale": {
+        "type": "glorot",
+        "mult": 2.0
+      }
+    },
+    "APH-O3only": {
+      "type": "aph",
+      "operators": [
+        "animal"
+      ],
+      "param_scale": {
+        "type": "glorot",
+        "mult": 2.0
+      }
+    },
+    "L-SHADE": {
+      "type": "lshade",
+      "param_scale": {
+        "type": "glorot",
+        "mult": 2.0
+      }
+    }
+  },
+  "baselines": {
+    "LogReg": {
+      "type": "logreg",
+      "C": 1.0
+    },
+    "MLP-Adam": {
+      "type": "mlp_backprop",
+      "solver": "adam",
+      "lr": 0.001,
+      "epochs": 150,
+      "hidden": [
+        16
+      ]
+    }
+  },
+  "save_weights": true
+}

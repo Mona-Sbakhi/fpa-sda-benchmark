@@ -80,7 +80,7 @@ def split_table():
 
 def cross_table():
     KK = load(BASE / "cnn_head"); KK["L-SHADE"] = load(BASE / "cnn_redesign")["L-SHADE"]
-    RR = load(BASE / "rsna_head"); KR = load(NEW / "cross_K2R"); RK = load(NEW / "cross_R2K")
+    RR = load(NEW / "rsna_adult"); KR = load(NEW / "cross_K2R_adult"); RK = load(NEW / "cross_R2K_adult")
     rows = []
     for a in METHODS:
         c = [LAB.get(a, a)]
@@ -89,8 +89,8 @@ def cross_table():
                   f"{100 * v(x, a, 'recall').mean():.1f}", f"{100 * v(x, a, 'specificity').mean():.1f}"]
         rows.append(" & ".join(c) + r" \\")
     cap = (r"Cross-dataset generalisation (frozen ResNet-50 features, 2048--16--2 head; mean over 20 runs). "
-           r"In: trained and tested on the same dataset (RSNA held-out test set; Kermany official test folder). "
-           r"Cross: trained on the other dataset (Kermany, paediatric $\rightarrow$ RSNA, adult; RSNA $\rightarrow$ Kermany), "
+           r"In: trained and tested on the same dataset (RSNA patient-grouped held-out test set of adults; Kermany official test folder). "
+           r"Cross: trained on the other dataset (Kermany, paediatric $\rightarrow$ RSNA, adults; RSNA $\rightarrow$ Kermany), "
            r"with standardisation statistics of the training dataset. For every stochastic method the in-domain versus "
            r"cross-dataset MCC difference has $p<10^{-4}$ (Wilcoxon signed-rank test); logistic regression is deterministic.")
     head = [r" & \multicolumn{5}{c}{Tested on RSNA} & \multicolumn{5}{c}{Tested on Kermany} \\",

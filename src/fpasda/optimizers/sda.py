@@ -1,4 +1,4 @@
-"""Seed-dispersal search as implemented in the original notebook (Sec. 4.4.2 of the manuscript).
+"""Seed-dispersal search as implemented in the reference implementation (Sec. 4.4.2 of the manuscript).
 
 Each seed picks one operator per iteration:
   wind   (p_wind)   x <- x + L * (x_best - x)              (Levy step towards the best)

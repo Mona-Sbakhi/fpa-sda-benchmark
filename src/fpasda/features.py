@@ -9,7 +9,7 @@ from sklearn.preprocessing import StandardScaler
 class PCAFeatures:
     """Flatten -> scale to [0,1] -> PCA(k) -> optional standardisation.
 
-    `standardize=False` reproduces the original notebook (raw PCA scores, which saturate the
+    `standardize=False` reproduces the reference implementation (raw PCA scores, which saturate the
     softmax when weights are drawn from [-1, 1]); `standardize=True` is the revised default.
     """
 

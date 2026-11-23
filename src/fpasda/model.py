@@ -1,6 +1,6 @@
 """Fully connected network whose parameters are a flat vector (for gradient-free optimisers).
 
-Layout of the flat vector (same as the original notebook): all weight matrices first
+Layout of the flat vector (same as the reference implementation): all weight matrices first
 (row-major, shape [in, out]), then all bias vectors.
 """
 from __future__ import annotations

@@ -1,0 +1,12 @@
+{
+  "frozen": {
+    "box_val_mcc": 0.6763,
+    "glorot_val_mcc": 0.7539,
+    "chosen": "glorot"
+  },
+  "ft0": {
+    "box_val_mcc": 0.9526,
+    "glorot_val_mcc": 0.9578,
+    "chosen": "glorot"
+  }
+}

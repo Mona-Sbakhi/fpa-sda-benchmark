@@ -87,6 +87,9 @@ def prepare(cfg: dict, out_dir: Path) -> Path:
     else:
         from sklearn.preprocessing import StandardScaler
         sc = StandardScaler().fit(X_tr[opt_idx]) if fc.get("standardize", True) else None
+        if sc is not None:
+            info["scaler"] = {"mean_sha": __import__("hashlib").sha1(sc.mean_.tobytes()).hexdigest()[:12]}
+            np.savez(out_dir / "scaler.npz", mean=sc.mean_, scale=sc.scale_)
         tf = (lambda Z: sc.transform(Z)) if sc else (lambda Z: Z)
         F_opt, F_val, F_te = tf(X_tr[opt_idx]), tf(X_tr[val_idx]), tf(X_te)
 
@@ -128,6 +131,8 @@ def run_one(task: tuple[str, int, str]) -> str:
         r = opt.run(obj, net.dim, rng)
         if scale is not None:
             r.best_x = r.best_x * scale       # back to network weights
+        if cfg.get("save_weights"):           # store the trained head (for later external evaluation)
+            np.save(str(out_path)[:-5] + ".npy", np.asarray(r.best_x, np.float32))
         elapsed = time.time() - t0
         ce, reg = fit.components(r.best_x)
         pv = net.predict_proba(r.best_x, data["X_val"])[:, 1]

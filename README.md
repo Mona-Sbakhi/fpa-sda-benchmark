@@ -40,6 +40,8 @@ hybrid_fpa_sda.ipynb   the original implementation that the study re-examines
 | `split_B_random_image`, `split_C_random_patient` | evaluation protocol: pooled Kermany images re-split at image level (B) or by patient (C) | 20 |
 | `cross_K2R`, `cross_R2K` | cross-dataset generalisation: Kermany → RSNA and RSNA → Kermany | 20 |
 | `cnn_budget5x` | five times the evaluation budget (33,795 evaluations) on the main task | 20 |
+| `rsna_adult`, `cross_K2R_adult`, `cross_R2K_adult` | corrected RSNA replication and cross-dataset runs: adults only, split by NIH patient (`scripts/rsna_resplit.py`) | 20 |
+| `ext_init_*`, `ext_final_*` | pre-registered external test on children (development runs; stored heads in `results/ext_final_*/runs/*/run_XX.npy`) | 10 / 20 |
 
 ## Reproduce
 ```bash
@@ -63,6 +65,13 @@ venv/bin/python scripts/run_experiments.py configs/rsna_head.json --workers 4
 venv/bin/python scripts/rsna_summary.py rsna_head   # summary and paired tests
 venv/bin/python scripts/rsna_table.py               # paper/tables/rsna.tex
 ```
+Pre-registered external test on children: the registration, its amendments, the deviation record and the
+fingerprints of all stored models are in `docs/external_test/`. Fine-tuning on the development data:
+`KEEP_WEIGHTS=1 scripts/finetune_cnn.py` (resumable); the three fine-tuned ResNet-50 weights (about 94 MB each) are
+too large for git and are attached to the GitHub release. External features: `scripts/ext_paed_features.py`;
+analysis: `scripts/ext_analysis.py`; table: `scripts/ext_table.py`. The earlier RSNA runs `rsna_head`, `cross_K2R`
+and `cross_R2K` used an image-level split and are kept for the record; the paper reports the corrected runs.
+
 Protocol, cross-dataset and budget studies: `scripts/split_summary.py`, `scripts/cross_summary.py`, and
 `scripts/extra_tables.py` (writes `paper/tables/split.tex`, `cross.tex`, `budget.tex`).
 The study-design figure (`paper/figures/workflow.pdf`) is drawn by `scripts/workflow_figure.py`.
