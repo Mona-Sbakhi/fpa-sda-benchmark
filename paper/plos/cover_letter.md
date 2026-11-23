@@ -17,7 +17,7 @@ five-fold cross-validation, after which all optimisers lie within about one perc
 We believe the work fits PLOS ONE because it is a methodologically rigorous negative result with a component
 analysis, in an area where single favourable comparisons of new hybrid metaheuristics are common. All code,
 configurations and per-run outputs, including test-set predictions, are public
-(https://github.com/Mona-Sbakhi/fpa-sda-benchmark; archived at https://doi.org/10.5281/zenodo.24343520),
+(https://github.com/Mona-Sbakhi/fpa-sda-benchmark; archived at https://doi.org/10.5281/zenodo.24466902),
 and every table, figure and in-text number is generated from those files by a single script.
 
 The manuscript is original, has not been published and is not under consideration elsewhere. The study uses
