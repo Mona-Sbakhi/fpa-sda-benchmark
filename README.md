@@ -68,7 +68,8 @@ venv/bin/python scripts/rsna_table.py               # paper/tables/rsna.tex
 Pre-registered external test on children: the registration, its amendments, the deviation record and the
 fingerprints of all stored models are in `docs/external_test/`. Fine-tuning on the development data:
 `KEEP_WEIGHTS=1 scripts/finetune_cnn.py` (resumable); the three fine-tuned ResNet-50 weights (about 94 MB each) are
-too large for git and are attached to the GitHub release. External features: `scripts/ext_paed_features.py`;
+stored in `pedicxr_kit/models/` (each under 100 MB). `pedicxr_kit/` is a self-contained kit that runs the
+confirmatory VinDr-PCXR test on a local computer (see `pedicxr_kit/README.md`). External features: `scripts/ext_paed_features.py`;
 analysis: `scripts/ext_analysis.py`; table: `scripts/ext_table.py`. The earlier RSNA runs `rsna_head`, `cross_K2R`
 and `cross_R2K` used an image-level split and are kept for the record; the paper reports the corrected runs.
 
