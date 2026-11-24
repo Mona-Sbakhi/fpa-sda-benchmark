@@ -89,7 +89,7 @@ lines(x + 1.2, TOP - 13.6, ["training fitness", "validation MCC", "test MCC"], d
 ax.text(x + 1.2, TOP - 21.0, "Statistics", fontsize=7.2, fontweight="bold", va="top")
 lines(x + 1.2, TOP - 23.6, ["Friedman, Nemenyi,", "Wilcoxon–Holm, Â,", "test bootstrap"], dy=2.3, size=7.0)
 ax.text(x + 1.2, TOP - 30.6, "Further", fontsize=7.2, fontweight="bold", va="top")
-lines(x + 1.2, TOP - 33.2, ["pre-registered test", "(448 children),", "calibration, Grad-CAM"], dy=2.1, size=6.8)
+lines(x + 1.2, TOP - 33.2, ["2 pre-registered tests", "(children, 2 hospitals),", "calibration, Grad-CAM"], dy=2.1, size=6.8)
 
 for (x0, w0), (x1, _) in zip(cols[:-1], cols[1:]):
     arrow(x0 + w0 + 0.4, TOP - H / 2, x1 - 0.4, TOP - H / 2)

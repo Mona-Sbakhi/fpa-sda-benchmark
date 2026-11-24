@@ -30,7 +30,7 @@ box(a1, 0.015, 0.52, 0.965, 0.38, "Task", ["Pneumonia vs normal chest X-rays",
     "32,818 weights, 6,795 fitness evaluations", "10 gradient-free optimisers, paired runs"])
 box(a1, 0.015, 0.06, 0.965, 0.40, "Evaluation", ["Kermany (patient-grouped), 50 runs",
     "RSNA adults (14,013 images, by patient)", "Cross-dataset, 5× budget, second backbone",
-    "Pre-registered external test (448 children)"], fc="#f3f2ee")
+    "Two pre-registered tests on children"], fc="#f3f2ee")
 
 a2 = fig.add_axes([0.43, 0.13, 0.25, 0.76], facecolor=SURF)
 names = [m[0] for m in mcc]; vals = [m[1] for m in mcc]
@@ -53,7 +53,7 @@ a3 = fig.add_axes([0.71, 0.04, 0.28, 0.90]); a3.axis("off"); a3.set_xlim(0, 1); 
 a3.text(0.0, 0.99, "Findings", weight="bold", fontsize=13.5, va="top")
 F = [("The hybrid is not better than SDA alone", "worse training fitness in all 50 runs;\nsame ranking on RSNA and at 5× budget"),
      ("Gains come from established components", "the redesign owes its MCC to current-to-pbest;\nplant operators alone: 0.38"),
-     ("Protocol and representation dominate", "re-splitting: up to +13.5 accuracy points;\nfine-tuned features: all methods 0.52–0.57")]
+     ("Protocol and representation dominate", "re-splitting: up to +13.5 accuracy points;\nexternal tests: fine-tuning moves all methods alike")]
 y = 0.86
 for t, s in F:
     a3.add_patch(FancyBboxPatch((0.015, y - 0.22), 0.965, 0.22, boxstyle="round,pad=0.01,rounding_size=0.02",

@@ -1,6 +1,7 @@
 Highlights
-- Plant-inspired FPA-SDA hybrid benchmarked under equal budgets and 50 paired runs
-- The hybrid does not outperform SDA and trails GA, PSO, DE and L-SHADE
-- Lengthening the FPA phase degrades the hybrid; SDA alone is as good as any schedule
-- A redesigned hybrid matches L-SHADE, but only through differential-evolution parts
-- Code, configurations and per-run predictions are released for full reproducibility
+
+- Two pre-registered tests on children: key operator helps less on fine-tuned features
+- The hybrid optimises worse than its own seed-dispersal part on two X-ray datasets
+- Gains of a redesigned hybrid come from a differential-evolution operator, not plants
+- Re-splitting pooled images, not patient overlap, inflates accuracy by up to 13 points
+- Every method loses most of its accuracy when tested on another patient population

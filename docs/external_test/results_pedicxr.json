@@ -1,0 +1,143 @@
+{
+  "n_images": 7140,
+  "class_counts": [
+    6050,
+    1090
+  ],
+  "resampling_unit": "image",
+  "n_units": 7140,
+  "Delta_frozen": 0.043430612261543086,
+  "Delta_frozen_CI": [
+    0.03479072289709252,
+    0.052282433112627785
+  ],
+  "Delta_finetuned": 0.009473887669516493,
+  "Delta_finetuned_CI": [
+    0.005594343139683866,
+    0.013145679904441125
+  ],
+  "I": -0.033956724592026595,
+  "I_CI": [
+    -0.04338689242514738,
+    -0.024699508029636448
+  ],
+  "verdict": "reversed",
+  "secondary": {
+    "frozen/APH": {
+      "mcc": 0.08605716967142599,
+      "auc": 0.5707638031693077,
+      "sens": 0.3027981651376147,
+      "spec": 0.7946280991735537
+    },
+    "frozen/APH-noO3": {
+      "mcc": 0.0426265574098829,
+      "auc": 0.5391587193873683,
+      "sens": 0.3759174311926605,
+      "spec": 0.6769256198347108
+    },
+    "frozen/APH-O3only": {
+      "mcc": 0.08825264739622261,
+      "auc": 0.5774559519296384,
+      "sens": 0.2948165137614679,
+      "spec": 0.8037024793388429
+    },
+    "frozen/L-SHADE": {
+      "mcc": 0.0897481970180523,
+      "auc": 0.5772559784669044,
+      "sens": 0.3090825688073394,
+      "spec": 0.7923223140495869
+    },
+    "frozen/LogReg": {
+      "mcc": 0.07220089140794596,
+      "auc": 0.5798934718325877,
+      "sens": 0.25504587155963304,
+      "spec": 0.8234710743801653
+    },
+    "frozen/MLP-Adam": {
+      "mcc": 0.09646716938057115,
+      "auc": 0.583866786716203,
+      "sens": 0.22169724770642202,
+      "spec": 0.8716363636363635
+    },
+    "finetuned/APH": {
+      "mcc": 0.2086686019811605,
+      "auc": 0.6669202871079435,
+      "sens": 0.13801223241590213,
+      "spec": 0.9739752066115703
+    },
+    "finetuned/APH-noO3": {
+      "mcc": 0.199194714311644,
+      "auc": 0.6672779879697728,
+      "sens": 0.14174311926605504,
+      "spec": 0.9695812672176308
+    },
+    "finetuned/APH-O3only": {
+      "mcc": 0.20906592865791104,
+      "auc": 0.6699020875982512,
+      "sens": 0.13256880733944953,
+      "spec": 0.9762093663911846
+    },
+    "finetuned/L-SHADE": {
+      "mcc": 0.2115557614393483,
+      "auc": 0.6718670520888619,
+      "sens": 0.13195718654434252,
+      "spec": 0.9773112947658402
+    },
+    "finetuned/LogReg": {
+      "mcc": 0.22148661556980465,
+      "auc": 0.6770354335683776,
+      "sens": 0.10917431192660551,
+      "spec": 0.9886501377410468
+    },
+    "finetuned/MLP-Adam": {
+      "mcc": 0.20741092180206333,
+      "auc": 0.6744291101170169,
+      "sens": 0.10776758409785933,
+      "spec": 0.9863415977961433
+    }
+  },
+  "data_summary": {
+    "label_files": [
+      "image_labels_train.csv",
+      "image_labels_test.csv"
+    ],
+    "pneumonia_columns": [
+      "Brocho-pneumonia",
+      "Pleuro-pneumonia",
+      "Pneumonia"
+    ],
+    "no_finding_column": "No finding",
+    "included_images": 7140,
+    "class_counts": [
+      6050,
+      1090
+    ],
+    "labelled_but_no_dicom": 0,
+    "dicom": {
+      "transfer_syntaxes": {
+        "Explicit VR Little Endian": {
+          "images": 26,
+          "decodes": true
+        },
+        "Implicit VR Little Endian": {
+          "images": 5081,
+          "decodes": true
+        },
+        "JPEG 2000 Image Compression (Lossless Only)": {
+          "images": 138,
+          "decodes": true
+        },
+        "JPEG Lossless, Non-Hierarchical (Process 14)": {
+          "images": 1895,
+          "decodes": true
+        }
+      },
+      "unreadable_files": 0,
+      "images_in_undecodable_syntax": 0,
+      "images_without_PatientID": 7140,
+      "distinct_PatientIDs": 0,
+      "resampling_unit_expected": "image"
+    }
+  },
+  "finished_utc": "2026-11-24T22:51:45Z"
+}
