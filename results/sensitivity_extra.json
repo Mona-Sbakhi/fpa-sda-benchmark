@@ -1,0 +1,78 @@
+{
+ "unseen_external": {
+  "n_images": 680,
+  "n_excluded": 167,
+  "n_patients": 384,
+  "Delta_frozen": 0.14046532310099616,
+  "Delta_finetuned": 0.020373181299256134,
+  "I": -0.12009214180174002,
+  "I_CI": [
+   -0.14651628830117067,
+   -0.09362575925131843
+  ]
+ },
+ "all_50": {
+  "n_runs": 50,
+  "friedman_chi2": 364.782034185962,
+  "friedman_p": 4.413910082975222e-73,
+  "mean_rank": {
+   "L-SHADE": 1.8,
+   "APH": 2.06,
+   "GA": 2.66,
+   "PSO": 3.96,
+   "DE": 5.88,
+   "Hybrid-reinit": 6.78,
+   "Hybrid": 6.88,
+   "SDA": 6.94,
+   "FPA": 8.58,
+   "Random": 9.46
+  },
+  "mean_mcc": {
+   "FPA": 0.26,
+   "SDA": 0.362,
+   "Hybrid": 0.35,
+   "Hybrid-reinit": 0.357,
+   "PSO": 0.498,
+   "DE": 0.402,
+   "GA": 0.561,
+   "Random": 0.178,
+   "APH": 0.581,
+   "L-SHADE": 0.585
+  },
+  "APH_vs_LSHADE_mcc_p": 0.4151920088524754,
+  "APH_vs_GA_mcc_p": 0.0021981232450851707,
+  "APH_lower_fitness_than_LSHADE_runs": 11
+ },
+ "without_pilot_seeds_0_4": {
+  "n_runs": 45,
+  "friedman_chi2": 330.37419181034477,
+  "friedman_p": 9.261285358829882e-66,
+  "mean_rank": {
+   "L-SHADE": 1.76,
+   "APH": 2.04,
+   "GA": 2.69,
+   "PSO": 3.98,
+   "DE": 5.8,
+   "Hybrid-reinit": 6.78,
+   "SDA": 6.91,
+   "Hybrid": 7.0,
+   "FPA": 8.6,
+   "Random": 9.44
+  },
+  "mean_mcc": {
+   "FPA": 0.255,
+   "SDA": 0.361,
+   "Hybrid": 0.343,
+   "Hybrid-reinit": 0.356,
+   "PSO": 0.497,
+   "DE": 0.405,
+   "GA": 0.559,
+   "Random": 0.178,
+   "APH": 0.581,
+   "L-SHADE": 0.585
+  },
+  "APH_vs_LSHADE_mcc_p": 0.34071305469274193,
+  "APH_vs_GA_mcc_p": 0.0025234905002662344,
+  "APH_lower_fitness_than_LSHADE_runs": 9
+ }
+}

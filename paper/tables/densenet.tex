@@ -1,0 +1,24 @@
+\begin{table}[!t]
+\centering
+\caption{Second backbone: test performance with frozen DenseNet-121 features (1024--16--2 head, $D=16{,}434$) and, for the same 20 seeds, with frozen ResNet-50 features (2048--16--2 head, $D=32{,}818$); mean$\pm$SD over 20 paired runs, 6,795 fitness evaluations for every gradient-free method.}
+\label{tab:densenet}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lcccc}
+\toprule
+ & \multicolumn{2}{c}{DenseNet-121} & \multicolumn{2}{c}{ResNet-50} \\ \cmidrule(lr){2-3}\cmidrule(lr){4-5}
+Method & MCC & AUC & MCC & AUC \\
+\midrule
+FPA & 0.449$\pm$0.083 & 0.810$\pm$0.041 & 0.243$\pm$0.091 & 0.675$\pm$0.058 \\
+SDA & 0.565$\pm$0.047 & 0.877$\pm$0.020 & 0.381$\pm$0.067 & 0.774$\pm$0.036 \\
+Hybrid FPA--SDA & 0.540$\pm$0.062 & 0.872$\pm$0.027 & 0.345$\pm$0.095 & 0.746$\pm$0.053 \\
+PSO & 0.656$\pm$0.038 & 0.921$\pm$0.011 & 0.507$\pm$0.058 & 0.856$\pm$0.027 \\
+GA & 0.642$\pm$0.032 & 0.930$\pm$0.008 & 0.565$\pm$0.038 & 0.890$\pm$0.018 \\
+APH (redesigned hybrid) & 0.677$\pm$0.029 & 0.936$\pm$0.011 & 0.581$\pm$0.031 & 0.899$\pm$0.012 \\
+L-SHADE & 0.667$\pm$0.030 & 0.936$\pm$0.010 & 0.587$\pm$0.030 & 0.900$\pm$0.012 \\
+\midrule
+Logistic regression & 0.644$\pm$0.000 & 0.948$\pm$0.000 & 0.635$\pm$0.000 & 0.934$\pm$0.000 \\
+MLP, backprop (weighted) & 0.675$\pm$0.022 & 0.948$\pm$0.005 & 0.682$\pm$0.023 & 0.948$\pm$0.004 \\
+\bottomrule
+\end{tabular}
+\end{table}

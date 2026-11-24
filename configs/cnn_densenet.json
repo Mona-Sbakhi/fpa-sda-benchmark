@@ -1,0 +1,85 @@
+{
+  "name": "cnn_densenet",
+  "description": "Second backbone: frozen ImageNet DenseNet-121 features (1024-d) instead of ResNet-50, same head (1024-16-2), budget and protocol; 20 runs with the seeds of cnn_head runs 0-19.",
+  "data": {
+    "root": "/home/user/data/chest_xray",
+    "size": 150,
+    "cache_dir": "cache"
+  },
+  "features": {
+    "type": "cnn",
+    "path": "cache/densenet121_224.npz",
+    "standardize": true
+  },
+  "split": {
+    "val_fraction": 0.2,
+    "seed": 42
+  },
+  "model": {
+    "hidden": [
+      16
+    ],
+    "l2_lambda": 0.001,
+    "class_weighted": true
+  },
+  "budget": {
+    "pop_size": 45,
+    "iterations": 150
+  },
+  "bounds": [
+    -1.0,
+    1.0
+  ],
+  "runs": 20,
+  "seed0": 0,
+  "output_dir": "results",
+  "algorithms": {
+    "FPA": {
+      "type": "fpa",
+      "switch_probability": 0.8
+    },
+    "SDA": {
+      "type": "sda",
+      "dispersal_probs": [
+        0.7,
+        0.15,
+        0.15
+      ]
+    },
+    "Hybrid": {
+      "type": "hybrid",
+      "transition": 75,
+      "mode": "transfer"
+    },
+    "GA": {
+      "type": "ga"
+    },
+    "PSO": {
+      "type": "pso"
+    },
+    "APH": {
+      "type": "aph"
+    },
+    "L-SHADE": {
+      "type": "lshade"
+    }
+  },
+  "baselines": {
+    "LogReg": {
+      "type": "logreg",
+      "C": 1.0
+    },
+    "MLP-weighted": {
+      "type": "mlp_weighted",
+      "hidden": [
+        16
+      ],
+      "lr": 0.001,
+      "weight_decay": 0.0001,
+      "batch_size": 64,
+      "epochs": 150,
+      "patience": 15
+    }
+  },
+  "save_weights": true
+}

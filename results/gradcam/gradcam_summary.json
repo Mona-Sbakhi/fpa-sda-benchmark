@@ -1,0 +1,36 @@
+{
+ "n_test": 624,
+ "uniform_outside_share": 0.5087492028061225,
+ "box": [
+  33,
+  190
+ ],
+ "groups": {
+  "TP": {
+   "n": 386,
+   "outside_share_mean": 0.2290266901254654,
+   "outside_share_median": 0.22808170318603516,
+   "prob_mean": 0.9952658414840698
+  },
+  "TN": {
+   "n": 166,
+   "outside_share_mean": 0.43431466817855835,
+   "outside_share_median": 0.3398142457008362,
+   "prob_mean": 0.09558884799480438
+  },
+  "FP": {
+   "n": 68,
+   "outside_share_mean": 0.1975485235452652,
+   "outside_share_median": 0.19580239057540894,
+   "prob_mean": 0.8764955997467041
+  },
+  "FN": {
+   "n": 4,
+   "outside_share_mean": 0.18207140266895294,
+   "outside_share_median": 0.18937140703201294,
+   "prob_mean": 0.27729469537734985
+  }
+ },
+ "FP_vs_TP_mannwhitney_p": 0.00040021564927883446,
+ "FP_vs_TN_mannwhitney_p": 8.090028646989822e-12
+}

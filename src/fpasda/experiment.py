@@ -144,6 +144,7 @@ def run_one(task: tuple[str, int, str]) -> str:
                "val": classification_metrics(data["y_val"], (pv >= 0.5).astype(int), pv),
                "test": classification_metrics(data["y_test"], (pt >= 0.5).astype(int), pt),
                "test_proba": [round(float(p), 6) for p in pt],
+               "val_proba": [round(float(p), 6) for p in pv],
                "extra": {k: v for k, v in r.extra.items() if k != "population"}}
     res["seed"] = seed
     Path(out_path).write_text(json.dumps(res))

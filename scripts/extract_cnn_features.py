@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Extract frozen ImageNet ResNet-50 features (2048-d global average pool) for every image.
+"""Extract frozen ImageNet ResNet-50 (2048-d) or DenseNet-121 (1024-d, --arch densenet121) global-average-pooled
+features for every image.
 
     python scripts/extract_cnn_features.py --root /home/user/data/chest_xray --out cache/resnet50_224.npz
 
@@ -25,6 +26,7 @@ ap.add_argument("--root", required=True)
 ap.add_argument("--out", default="cache/resnet50_224.npz")
 ap.add_argument("--size", type=int, default=224)
 ap.add_argument("--batch", type=int, default=64)
+ap.add_argument("--arch", default="resnet50", choices=["resnet50", "densenet121"])
 args = ap.parse_args()
 
 root = Path(args.root)
@@ -33,9 +35,14 @@ va_p, va_y = _list_split(root, "val")
 te_p, te_y = _list_split(root, "test")
 tr_p, tr_y = tr_p + va_p, np.concatenate([tr_y, va_y])
 
-weights = torchvision.models.ResNet50_Weights.IMAGENET1K_V2
-net = torchvision.models.resnet50(weights=weights)
-net.fc = torch.nn.Identity()
+if args.arch == "resnet50":
+    weights = torchvision.models.ResNet50_Weights.IMAGENET1K_V2
+    net = torchvision.models.resnet50(weights=weights)
+    net.fc = torch.nn.Identity()
+else:   # DenseNet-121 (the CheXNet backbone): 1024-d global-average-pooled features
+    weights = torchvision.models.DenseNet121_Weights.IMAGENET1K_V1
+    net = torchvision.models.densenet121(weights=weights)
+    net.classifier = torch.nn.Identity()
 net.eval()
 dev = "cuda" if torch.cuda.is_available() else "cpu"
 net.to(dev)
@@ -44,7 +51,7 @@ std = torch.tensor([0.229, 0.224, 0.225]).view(1, 3, 1, 1)
 
 
 def feats(paths):
-    out = np.empty((len(paths), 2048), np.float32)
+    out = np.empty((len(paths), 1024 if args.arch == "densenet121" else 2048), np.float32)
     for s in range(0, len(paths), args.batch):
         imgs = [cv2.resize(cv2.imread(str(p), cv2.IMREAD_GRAYSCALE), (args.size, args.size),
                            interpolation=cv2.INTER_AREA) for p in paths[s:s + args.batch]]

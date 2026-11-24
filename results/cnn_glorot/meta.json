@@ -1,0 +1,92 @@
+{
+  "package_version": "0.2.0",
+  "python": "3.13.18",
+  "numpy": "2.5.3",
+  "scipy": "1.18.1",
+  "sklearn": "1.9.1",
+  "platform": "Linux-6.18.44-fc-v819-x86_64-with-glibc2.39",
+  "processor": "x86_64",
+  "cpu_count": 4,
+  "started": "2026-11-24 10:24:25",
+  "config": {
+    "name": "cnn_glorot",
+    "description": "Search-space sensitivity: main gradient-free methods in the Glorot-scaled space (z in [-1,1], weights = 2 x Glorot limit x z) on the main Kermany task; 20 runs with the seeds of cnn_head runs 0-19.",
+    "data": {
+      "root": "/home/user/data/chest_xray",
+      "size": 150,
+      "cache_dir": "cache"
+    },
+    "features": {
+      "type": "cnn",
+      "path": "cache/resnet50_224.npz",
+      "standardize": true
+    },
+    "split": {
+      "val_fraction": 0.2,
+      "seed": 42
+    },
+    "model": {
+      "hidden": [
+        16
+      ],
+      "l2_lambda": 0.001,
+      "class_weighted": true
+    },
+    "budget": {
+      "pop_size": 45,
+      "iterations": 150
+    },
+    "bounds": [
+      -1.0,
+      1.0
+    ],
+    "runs": 20,
+    "seed0": 0,
+    "output_dir": "results",
+    "algorithms": {
+      "FPA": {
+        "type": "fpa",
+        "switch_probability": 0.8,
+        "param_scale": {
+          "type": "glorot",
+          "mult": 2.0
+        }
+      },
+      "SDA": {
+        "type": "sda",
+        "dispersal_probs": [
+          0.7,
+          0.15,
+          0.15
+        ],
+        "param_scale": {
+          "type": "glorot",
+          "mult": 2.0
+        }
+      },
+      "Hybrid": {
+        "type": "hybrid",
+        "transition": 75,
+        "mode": "transfer",
+        "param_scale": {
+          "type": "glorot",
+          "mult": 2.0
+        }
+      },
+      "GA": {
+        "type": "ga",
+        "param_scale": {
+          "type": "glorot",
+          "mult": 2.0
+        }
+      },
+      "L-SHADE": {
+        "type": "lshade",
+        "param_scale": {
+          "type": "glorot",
+          "mult": 2.0
+        }
+      }
+    }
+  }
+}

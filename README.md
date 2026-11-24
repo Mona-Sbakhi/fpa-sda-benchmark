@@ -42,6 +42,16 @@ hybrid_fpa_sda.ipynb   the original implementation that the study re-examines
 | `cnn_budget5x` | five times the evaluation budget (33,795 evaluations) on the main task | 20 |
 | `rsna_adult`, `cross_K2R_adult`, `cross_R2K_adult` | corrected RSNA replication and cross-dataset runs: adults only, split by NIH patient (`scripts/rsna_resplit.py`) | 20 |
 | `ext_init_*`, `ext_final_*` | pre-registered external test on children (development runs; stored heads in `results/ext_final_*/runs/*/run_XX.npy`) | 10 / 20 |
+| `cnn_glorot` | search-space sensitivity: FPA, SDA, hybrid, GA, L-SHADE in the Glorot-scaled space | 20 |
+| `mlp_weighted_kermany`, `mlp_weighted_rsna` | gradient reference trained on the same problem (class-weighted CE, early stopping on the patient-grouped validation subset) | 50 / 20 |
+| `cnn_densenet` | second backbone: frozen DenseNet-121 features (`extract_cnn_features.py --arch densenet121`, D = 16,434) | 20 |
+| `cnn_calib` | main methods rerun with stored validation probabilities and head weights, for `scripts/calibration_threshold.py` (reproduces `cnn_head`/`cnn_redesign`/`cnn_cma` runs 0–19 exactly) | 20 |
+
+Further analyses: `scripts/sensitivity_extra.py` (pilot seeds, previously seen external images),
+`scripts/calibration_threshold.py cnn_calib cnn_densenet` (Brier, ECE, PR-AUC, validation-chosen threshold),
+`scripts/backbone_calib_tables.py` (tables of the two analyses), `scripts/gradcam_errors.py` (Grad-CAM error
+analysis of the fine-tuned network; needs the fine-tuned weights and the 256-px image bundle) and
+`scripts/graphical_abstract.py`.
 
 ## Reproduce
 ```bash
