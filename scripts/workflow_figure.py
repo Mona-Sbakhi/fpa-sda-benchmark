@@ -13,10 +13,10 @@ plt.rcParams.update({"font.family": "serif", "font.size": 7.5})
 GREY, BLUE, PLANT = "#555555", "#1f5fa8", "#3c7a3c"
 FILL = {"data": "#f2f2f2", "feat": "#eef3fa", "opt": "#ffffff", "eval": "#f2f2f2"}
 
-fig = plt.figure(figsize=(7.5, 4.4))
+fig = plt.figure(figsize=(7.5, 4.62))
 ax = fig.add_axes([0, 0, 1, 1])
 ax.set_xlim(0, 100)
-ax.set_ylim(2, 62)
+ax.set_ylim(2, 65)
 ax.axis("off")
 
 
@@ -39,8 +39,8 @@ def arrow(x0, y0, x1, y1, color=GREY, lw=1.1, style="-|>"):
                                  color=color, lw=lw, shrinkA=0, shrinkB=0))
 
 
-TOP, H = 60, 37          # top of the four stage columns and their height
-cols = [(1, 21), (25, 22), (51, 26), (81, 18)]
+TOP, H = 63, 40          # top of the four stage columns and their height
+cols = [(1, 21), (25, 22), (51, 26), (80, 19)]
 
 # 1 data
 x, w = cols[0]
@@ -52,7 +52,7 @@ lines(x + 1.2, TOP - 16.8, ["624 images, held out,", "used once per model"])
 ax.text(x + 1.2, TOP - 23.0, "Patient-grouped split", fontsize=7.2, fontweight="bold", va="top")
 lines(x + 1.2, TOP - 25.6, ["optimisation  4,186", "validation      1,046"])
 ax.text(x + 1.2, TOP - 31.4, "Replication: RSNA,", fontsize=7.2, fontweight="bold", va="top")
-lines(x + 1.2, TOP - 34.0, ["14,863 adult images"])
+lines(x + 1.2, TOP - 34.0, ["14,013 images, adults"])
 
 # 2 features
 x, w = cols[1]
@@ -64,6 +64,8 @@ ax.text(x + 1.2, TOP - 16.4, "(b) Frozen ResNet-50", fontsize=7.2, fontweight="b
 lines(x + 1.2, TOP - 19.0, ["2,048 features", "head 2048–16–2, D = 32,818", "main benchmark"])
 ax.text(x + 1.2, TOP - 27.6, "(c) Fine-tuned ResNet-50", fontsize=7.2, fontweight="bold", va="top")
 lines(x + 1.2, TOP - 30.2, ["5-fold patient-grouped CV"])
+ax.text(x + 1.2, TOP - 33.6, "(d) Frozen DenseNet-121", fontsize=7.2, fontweight="bold", va="top")
+lines(x + 1.2, TOP - 36.2, ["head 1024–16–2, D = 16,434"])
 
 # 3 optimisers
 x, w = cols[2]
@@ -83,9 +85,11 @@ box(x, TOP - H, w, H, FILL["eval"])
 head(x, TOP - 1.2, w, "4", "Evaluation")
 lines(x + 1.2, TOP - 5.2, ["50 paired runs", "(20 on RSNA)"])
 ax.text(x + 1.2, TOP - 11.0, "Three endpoints", fontsize=7.2, fontweight="bold", va="top")
-lines(x + 1.2, TOP - 13.6, ["training fitness", "validation MCC", "test MCC"])
-ax.text(x + 1.2, TOP - 22.0, "Statistics", fontsize=7.2, fontweight="bold", va="top")
-lines(x + 1.2, TOP - 24.6, ["Friedman, Nemenyi", "Wilcoxon–Holm, Â", "test bootstrap"], size=7.0)
+lines(x + 1.2, TOP - 13.6, ["training fitness", "validation MCC", "test MCC"], dy=2.3)
+ax.text(x + 1.2, TOP - 21.0, "Statistics", fontsize=7.2, fontweight="bold", va="top")
+lines(x + 1.2, TOP - 23.6, ["Friedman, Nemenyi,", "Wilcoxon–Holm, Â,", "test bootstrap"], dy=2.3, size=7.0)
+ax.text(x + 1.2, TOP - 30.6, "Further", fontsize=7.2, fontweight="bold", va="top")
+lines(x + 1.2, TOP - 33.2, ["pre-registered test", "(448 children),", "calibration, Grad-CAM"], dy=2.1, size=6.8)
 
 for (x0, w0), (x1, _) in zip(cols[:-1], cols[1:]):
     arrow(x0 + w0 + 0.4, TOP - H / 2, x1 - 0.4, TOP - H / 2)

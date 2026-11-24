@@ -1,6 +1,6 @@
 \begin{table}[!t]
 \centering
-\caption{Calibration and decision threshold on the Kermany test set (frozen ResNet-50 features, 20 runs, seeds of runs 0--19). PR-AUC: average precision; ECE: expected calibration error (10 bins); $t_\mathrm{val}$: threshold maximising MCC on the validation subset; last column: runs in which $t_\mathrm{val}$ improved test MCC.}
+\caption{Calibration and decision threshold on the Kermany test set (frozen ResNet-50 features, 20 runs, seeds of runs 0--19). PR-AUC: average precision; ECE: expected calibration error (10 bins); $t_\mathrm{val}$: threshold maximising MCC on the validation subset; last column: runs in which $t_\mathrm{val}$ improved test MCC (det.: deterministic method, a single model).}
 \label{tab:calibration}
 \footnotesize
 \setlength{\tabcolsep}{3.5pt}
@@ -17,7 +17,7 @@ APH (redesigned hybrid) & 0.937 & 0.147 & 0.123 & 0.581 & 0.37 & 0.548 & 2/20 \\
 L-SHADE & 0.935 & 0.146 & 0.122 & 0.587 & 0.34 & 0.536 & 0/20 \\
 sep-CMA-ES & 0.868 & 0.203 & 0.149 & 0.444 & 0.35 & 0.424 & 8/20 \\
 \midrule
-Logistic regression & 0.954 & 0.152 & 0.161 & 0.635 & 0.47 & 0.625 & 0/20 \\
+Logistic regression & 0.954 & 0.152 & 0.161 & 0.635 & 0.47 & 0.625 & no (det.) \\
 MLP, backprop (weighted) & 0.965 & 0.116 & 0.120 & 0.682 & 0.40 & 0.649 & 5/20 \\
 \bottomrule
 \end{tabular}

@@ -76,10 +76,15 @@ L += [r"\bottomrule", r"\end{tabular}", r"\end{table}"]
 (OUT / "densenet.tex").write_text("\n".join(L) + "\n")
 
 C = json.load(open(ROOT / "results" / "calibration_cnn_calib.json"))
+
+
+def imp(a):   # deterministic methods give one model, repeated in every run
+    det = len({round(r["mcc_05"], 9) for r in C[a]["runs"]}) == 1 and len({r["t_val"] for r in C[a]["runs"]}) == 1
+    return ("yes" if C[a]["gain_runs_improved"] else "no") + " (det.)" if det else f"{C[a]['gain_runs_improved']}/{C[a]['n_runs']}"
 L = [r"\begin{table}[!t]", r"\centering",
      r"\caption{Calibration and decision threshold on the Kermany test set (frozen ResNet-50 features, 20 runs, seeds of "
      r"runs 0--19). PR-AUC: average precision; ECE: expected calibration error (10 bins); $t_\mathrm{val}$: threshold "
-     r"maximising MCC on the validation subset; last column: runs in which $t_\mathrm{val}$ improved test MCC.}",
+     r"maximising MCC on the validation subset; last column: runs in which $t_\mathrm{val}$ improved test MCC (det.: deterministic method, a single model).}",
      r"\label{tab:calibration}", r"\footnotesize", r"\setlength{\tabcolsep}{3.5pt}",
      r"\begin{tabular}{lccccccc}", r"\toprule",
      r"Method & PR-AUC & Brier & ECE & MCC$_{0.5}$ & $t_\mathrm{val}$ & MCC$_{t_\mathrm{val}}$ & Improved \\", r"\midrule"]
@@ -90,7 +95,7 @@ for a in ORDER:
         L.append(r"\midrule")
     m = C[a]["mean"]
     L.append(f"{LABEL.get(a, a)} & {m['pr_auc']:.3f} & {m['brier']:.3f} & {m['ece']:.3f} & {m['mcc_05']:.3f} & "
-             f"{m['t_val']:.2f} & {m['mcc_tval']:.3f} & {C[a]['gain_runs_improved']}/{C[a]['n_runs']} \\\\")
+             f"{m['t_val']:.2f} & {m['mcc_tval']:.3f} & {imp(a)} \\\\")
 L += [r"\bottomrule", r"\end{tabular}", r"\end{table}"]
 (OUT / "calibration.tex").write_text("\n".join(L) + "\n")
 print("tables written to", OUT)

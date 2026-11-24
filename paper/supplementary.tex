@@ -1,0 +1,64 @@
+\documentclass[preprint,12pt]{elsarticle}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,bm}
+\usepackage{booktabs,multirow,array}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage{lineno}
+\input{tables/numbers}
+\newif\ifshowfigures
+\showfigurestrue
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\vecop}{\operatorname{vec}}
+\newcommand{\clip}{\operatorname{clip}}
+\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+\renewcommand{\algorithmicensure}{\textbf{Output:}}
+
+
+\begin{document}
+\renewcommand{\thetable}{S\arabic{table}}
+\begin{center}{\Large\textbf{Supplementary material}}\\[6pt]
+{\large Do plant-inspired operators help to train a pneumonia classifier? A controlled benchmark and component analysis of a hybrid Flower Pollination--Seed Dispersal algorithm}\\[6pt]
+Mona Alsbakhi, Ahmed Alsaqqa, Mohammed Lubbad\\[2pt]
+\emph{Computers in Biology and Medicine}\end{center}
+
+Tables S1--S12 are cited in the main text. Code, configurations and all per-run outputs are available at \url{https://github.com/Mona-Sbakhi/fpa-sda-benchmark}.
+
+\begin{table}[!ht]
+\centering
+\caption{Positioning of this study.}
+\label{tab:taxonomy}
+\footnotesize
+\begin{tabular}{p{3.0cm}p{3.6cm}p{5.2cm}}
+\toprule
+Strand & Representative work & Gap addressed here \\
+\midrule
+Plant-inspired optimisers & \citet{yang2012fpa}; \citet{abdelbasset2019fpareview}; \citet{sulaiman2015sbppa} & Operators evaluated in isolation against DE-type components (ablation) \\
+FPA in medical AI & \citet{zhou2025fpaensemble}; \citet{kaya2024fpaanfis} & Weight training under equal budgets, paired runs, official test split \\
+Adaptive DE & \citet{zhang2009jade}; \citet{tanabe2013shade,tanabe2014lshade} & Used as strong baseline and as host framework for APH \\
+Large-scale gradient-free & \citet{salimans2017es}; \citet{malladi2023mezo}; \citet{qiu2025esllm} & Included as cross-field baselines \\
+Evaluation methodology & \citet{derrac2011tutorial}; \citet{demsar2006}; \citet{sorensen2015metaphor} & Applied throughout; component-level conclusions \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\input{tables/pca}
+\input{tables/friedman}
+\input{tables/wilcoxon}
+\input{tables/contrasts}
+\input{tables/bootstrap}
+\input{tables/tau}
+\input{tables/finetune}
+\input{tables/cvhead}
+\input{tables/budget}
+\input{tables/densenet}
+\input{tables/calibration}
+\bibliographystyle{elsarticle-num-names}
+\bibliography{refs}
+\end{document}
